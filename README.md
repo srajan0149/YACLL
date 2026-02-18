@@ -17,7 +17,7 @@ Yet Another C Like Language
 
 ## Important Files
 
-## yapl.h
+### yapl.h
 Do we need to add this? Or is it auto-generated?
 
 ### yapl.l
