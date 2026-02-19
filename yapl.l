@@ -1,19 +1,18 @@
-O   [0-7]
-D   [0-9]
-DU  {D}({D}|_)*
-NZ  [1-9]
-L   [a-zA-Z_]
-A   [a-zA-Z_0-9]
-H   [a-fA-F0-9]
-HP  (0[xX])
-E   ([Ee][+-]?{D}+)
-P   ([Pp][+-]?{D}+)
-FS  (f|F|l|L)
-IS  (((u|U)(l|L|ll|LL)?)|((l|L|ll|LL)(u|U)?))
-CP  (u|U|L)
-SP  (u8|u|U|L)
-ES  (\\(['"\?\\abfnrtv]|[0-7]{1,3}|x[a-fA-F0-9]+))
-WS  [ \t\v\n\f]
+O   [0-7]           // octal digit
+D   [0-9]           // decimal digit
+NZ  [1-9]           
+L   [a-zA-Z_]       // identifier first letter
+A   [a-zA-Z_0-9]    // identifier letters
+H   [a-fA-F0-9]     // hexadecimal digit
+HP  (0[xX])         // hexadecimal start
+E   ([Ee][+-]?{D}+) // exponent part like 1e-5
+P   ([Pp][+-]?{D}+) // hexadecimal floating-point literal Idk, ask chatgpt
+FS  (f|F|l|L)       // for floating/long literals like 156L
+IS  (((u|U)(l|L|ll|LL)?)|((l|L|ll|LL)(u|U)?))       // unsigned long long
+CP  (u|U|L)         // unsigned or long
+SP  (u8|u|U|L)      // u8 as a string literal prefix
+ES  (\\(['"\?\\abfnrtv]|[0-7]{1,3}|x[a-fA-F0-9]+))  // escape sequences
+WS  [ \t\v\n\f]     // whitespaces
 
 %{
 #include <stdio.h>
