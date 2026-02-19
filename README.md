@@ -20,9 +20,9 @@ make yapl
 
 ## Test Instructions
 
-The file YACLL_TEST.c has a few test functions that uses all possible tokens in YACLL to test the lexer. It can be executed with the following command.
+The file lex_test.c has a few test functions that uses all possible tokens in YACLL to test the lexer. It can be executed with the following command.
 ```Shell
-./yapl YACLL_TEST.c
+./yapl lex_test.c
 ```
 
 ## Important Files
