@@ -1,5 +1,5 @@
 
-#line 2 "lex.yy.c"
+#line 3 "lex.yy.c"
 
 #define  YY_INT_ALIGNED short int
 
@@ -643,7 +643,7 @@ int yy_flex_debug = 0;
 #define YY_RESTORE_YY_MORE_OFFSET
 char *yytext;
 #line 1 "yapl.l"
-#line 26 "yapl.l"
+#line 18 "yapl.l"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -659,8 +659,8 @@ extern int sym_type(const char *);  /* returns type from symbol table */
 
 static void comment(void);
 static int check_type(void);
-#line 662 "lex.yy.c"
 #line 663 "lex.yy.c"
+#line 664 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -877,9 +877,9 @@ YY_DECL
 		}
 
 	{
-#line 43 "yapl.l"
+#line 35 "yapl.l"
 
-#line 882 "lex.yy.c"
+#line 883 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -938,367 +938,367 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 44 "yapl.l"
+#line 36 "yapl.l"
 { comment(); }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 45 "yapl.l"
+#line 37 "yapl.l"
 { /* consume //-comment */ }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 47 "yapl.l"
+#line 39 "yapl.l"
 { return(BREAK); }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 48 "yapl.l"
+#line 40 "yapl.l"
 { return(CASE); }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 49 "yapl.l"
+#line 41 "yapl.l"
 { return(CHAR); }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 50 "yapl.l"
+#line 42 "yapl.l"
 { return(CONTINUE); }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 51 "yapl.l"
+#line 43 "yapl.l"
 { return(DEFAULT); }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 52 "yapl.l"
+#line 44 "yapl.l"
 { return(DO); }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 53 "yapl.l"
+#line 45 "yapl.l"
 { return(DOUBLE); }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 54 "yapl.l"
+#line 46 "yapl.l"
 { return(ELSE); }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 55 "yapl.l"
+#line 47 "yapl.l"
 { return(EXTERN); }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 56 "yapl.l"
+#line 48 "yapl.l"
 { return(FLOAT); }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 57 "yapl.l"
+#line 49 "yapl.l"
 { return(FOR); }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 58 "yapl.l"
+#line 50 "yapl.l"
 { return(IF); }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 59 "yapl.l"
+#line 51 "yapl.l"
 { return(INT); }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 60 "yapl.l"
+#line 52 "yapl.l"
 { return(LONG); }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 61 "yapl.l"
+#line 53 "yapl.l"
 { return(RETURN); }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 62 "yapl.l"
+#line 54 "yapl.l"
 { return(SHORT); }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 63 "yapl.l"
+#line 55 "yapl.l"
 { return(SIZEOF); }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 64 "yapl.l"
+#line 56 "yapl.l"
 { return(STRUCT); }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 65 "yapl.l"
+#line 57 "yapl.l"
 { return(SWITCH); }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 66 "yapl.l"
+#line 58 "yapl.l"
 { return(VOID); }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 67 "yapl.l"
+#line 59 "yapl.l"
 { return(WHILE); }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 69 "yapl.l"
+#line 61 "yapl.l"
 { return check_type(); }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 71 "yapl.l"
+#line 63 "yapl.l"
 { return I_CONSTANT; }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 72 "yapl.l"
+#line 64 "yapl.l"
 { return I_CONSTANT; }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 73 "yapl.l"
+#line 65 "yapl.l"
 { return I_CONSTANT; }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 74 "yapl.l"
+#line 66 "yapl.l"
 { return I_CONSTANT; }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 76 "yapl.l"
+#line 68 "yapl.l"
 { return F_CONSTANT; }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 77 "yapl.l"
+#line 69 "yapl.l"
 { return F_CONSTANT; }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 78 "yapl.l"
+#line 70 "yapl.l"
 { return F_CONSTANT; }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 79 "yapl.l"
+#line 71 "yapl.l"
 { return F_CONSTANT; }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 80 "yapl.l"
+#line 72 "yapl.l"
 { return F_CONSTANT; }
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 81 "yapl.l"
+#line 73 "yapl.l"
 { return F_CONSTANT; }
 	YY_BREAK
 case 35:
 /* rule 35 can match eol */
 YY_RULE_SETUP
-#line 83 "yapl.l"
+#line 75 "yapl.l"
 { return STRING_LITERAL; }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 85 "yapl.l"
+#line 77 "yapl.l"
 { return TH_OP; }
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 86 "yapl.l"
+#line 78 "yapl.l"
 { return INC_OP; }
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 87 "yapl.l"
+#line 79 "yapl.l"
 { return DEC_OP; }
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 88 "yapl.l"
+#line 80 "yapl.l"
 { return PTR_OP; }
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 89 "yapl.l"
+#line 81 "yapl.l"
 { return AND_OP; }
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 90 "yapl.l"
+#line 82 "yapl.l"
 { return OR_OP; }
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 91 "yapl.l"
+#line 83 "yapl.l"
 { return LE_OP; }
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 92 "yapl.l"
+#line 84 "yapl.l"
 { return GE_OP; }
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 93 "yapl.l"
+#line 85 "yapl.l"
 { return EQ_OP; }
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 94 "yapl.l"
+#line 86 "yapl.l"
 { return NE_OP; }
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 95 "yapl.l"
+#line 87 "yapl.l"
 { return ';'; }
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 96 "yapl.l"
+#line 88 "yapl.l"
 { return '{'; }
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 97 "yapl.l"
+#line 89 "yapl.l"
 { return '}'; }
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 98 "yapl.l"
+#line 90 "yapl.l"
 { return ','; }
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 99 "yapl.l"
+#line 91 "yapl.l"
 { return ':'; }
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 100 "yapl.l"
+#line 92 "yapl.l"
 { return '='; }
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 101 "yapl.l"
+#line 93 "yapl.l"
 { return '('; }
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 102 "yapl.l"
+#line 94 "yapl.l"
 { return ')'; }
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
-#line 103 "yapl.l"
+#line 95 "yapl.l"
 { return '['; }
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
-#line 104 "yapl.l"
+#line 96 "yapl.l"
 { return ']'; }
 	YY_BREAK
 case 56:
 YY_RULE_SETUP
-#line 105 "yapl.l"
+#line 97 "yapl.l"
 { return '.'; }
 	YY_BREAK
 case 57:
 YY_RULE_SETUP
-#line 106 "yapl.l"
+#line 98 "yapl.l"
 { return '&'; }
 	YY_BREAK
 case 58:
 YY_RULE_SETUP
-#line 107 "yapl.l"
+#line 99 "yapl.l"
 { return '!'; }
 	YY_BREAK
 case 59:
 YY_RULE_SETUP
-#line 108 "yapl.l"
+#line 100 "yapl.l"
 { return '~'; }
 	YY_BREAK
 case 60:
 YY_RULE_SETUP
-#line 109 "yapl.l"
+#line 101 "yapl.l"
 { return '-'; }
 	YY_BREAK
 case 61:
 YY_RULE_SETUP
-#line 110 "yapl.l"
+#line 102 "yapl.l"
 { return '+'; }
 	YY_BREAK
 case 62:
 YY_RULE_SETUP
-#line 111 "yapl.l"
+#line 103 "yapl.l"
 { return '*'; }
 	YY_BREAK
 case 63:
 YY_RULE_SETUP
-#line 112 "yapl.l"
+#line 104 "yapl.l"
 { return '/'; }
 	YY_BREAK
 case 64:
 YY_RULE_SETUP
-#line 113 "yapl.l"
+#line 105 "yapl.l"
 { return '%'; }
 	YY_BREAK
 case 65:
 YY_RULE_SETUP
-#line 114 "yapl.l"
+#line 106 "yapl.l"
 { return '<'; }
 	YY_BREAK
 case 66:
 YY_RULE_SETUP
-#line 115 "yapl.l"
+#line 107 "yapl.l"
 { return '>'; }
 	YY_BREAK
 case 67:
 YY_RULE_SETUP
-#line 116 "yapl.l"
+#line 108 "yapl.l"
 { return '^'; }
 	YY_BREAK
 case 68:
 YY_RULE_SETUP
-#line 117 "yapl.l"
+#line 109 "yapl.l"
 { return '|'; }
 	YY_BREAK
 case 69:
 YY_RULE_SETUP
-#line 118 "yapl.l"
+#line 110 "yapl.l"
 { return '?'; }
 	YY_BREAK
 case 70:
 /* rule 70 can match eol */
 YY_RULE_SETUP
-#line 120 "yapl.l"
+#line 112 "yapl.l"
 { /* whitespace separates tokens */ }
 	YY_BREAK
 case 71:
 YY_RULE_SETUP
-#line 121 "yapl.l"
+#line 113 "yapl.l"
 { /* discard bad characters */ }
 	YY_BREAK
 case 72:
 YY_RULE_SETUP
-#line 123 "yapl.l"
+#line 115 "yapl.l"
 ECHO;
 	YY_BREAK
-#line 1301 "lex.yy.c"
+#line 1302 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2303,7 +2303,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 123 "yapl.l"
+#line 115 "yapl.l"
 
 
 int yywrap(void)        /* called at end of input */
@@ -2340,616 +2340,5 @@ static int check_type(void)
         default:                          /* includes undefined */
         return IDENTIFIER;
     }
-}
-
-%{
-#include<stdio.h>
-extern char *yytext;
-int global_declarations=0;
-int func_definitions=0;
-int int_consts=0;
-int pointer_decls=0;
-int ifs_wo_else=0;
-int ladder_len=0,hold=0;
-int max=-1;
-%}
-
-%token	IDENTIFIER I_CONSTANT F_CONSTANT STRING_LITERAL FUNC_NAME SIZEOF
-%token	PTR_OP INC_OP DEC_OP LEFT_OP RIGHT_OP LE_OP GE_OP EQ_OP NE_OP TH_OP
-%token	AND_OP OR_OP MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN ADD_ASSIGN
-%token	SUB_ASSIGN LEFT_ASSIGN RIGHT_ASSIGN AND_ASSIGN
-%token	XOR_ASSIGN OR_ASSIGN
-%token	TYPEDEF_NAME ENUMERATION_CONSTANT
-
-%token	TYPEDEF EXTERN STATIC AUTO REGISTER INLINE
-%token	CONST RESTRICT VOLATILE
-%token	BOOL CHAR SHORT INT LONG SIGNED UNSIGNED FLOAT DOUBLE VOID
-%token	COMPLEX IMAGINARY 
-%token	STRUCT UNION ENUM ELLIPSIS
-
-%token	CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN
-
-%token	ALIGNAS ALIGNOF ATOMIC GENERIC NORETURN STATIC_ASSERT THREAD_LOCAL
-
-%start translation_unit
-
-%type <val> IF
-%type <val> ELSE
-
-%union
-{
-	int val;
-	struct symtab *symp;
-}
-
-%%
-
-primary_expression
-	: IDENTIFIER
-	| constant
-	| string
-	| '(' expression ')'
-	| generic_selection
-	;
-
-constant
-	: I_CONSTANT {int_consts++;}	/* includes character_constant */
-	| F_CONSTANT
-	| ENUMERATION_CONSTANT	/* after it has been defined as such */
-	;
-
-enumeration_constant		/* before it has been defined as such */
-	: IDENTIFIER
-	;
-
-string
-	: STRING_LITERAL
-	| FUNC_NAME
-	;
-
-generic_selection
-	: GENERIC '(' assignment_expression ',' generic_assoc_list ')'
-	;
-
-generic_assoc_list
-	: generic_association
-	| generic_assoc_list ',' generic_association
-	;
-
-generic_association
-	: type_name ':' assignment_expression
-	| DEFAULT ':' assignment_expression
-	;
-
-postfix_expression
-	: primary_expression
-	| postfix_expression '[' expression ']'
-	| postfix_expression '(' ')'
-	| postfix_expression '(' argument_expression_list ')'
-	| postfix_expression '.' IDENTIFIER
-	| postfix_expression PTR_OP IDENTIFIER
-	| postfix_expression INC_OP
-	| postfix_expression DEC_OP
-	| '(' type_name ')' '{' initializer_list '}'
-	| '(' type_name ')' '{' initializer_list ',' '}'
-	;
-
-argument_expression_list
-	: assignment_expression
-	| argument_expression_list ',' assignment_expression
-	;
-
-unary_expression
-	: postfix_expression
-	| INC_OP unary_expression
-	| DEC_OP unary_expression
-	| unary_operator cast_expression
-	| SIZEOF unary_expression
-	| SIZEOF '(' type_name ')'
-	| ALIGNOF '(' type_name ')'
-	;
-
-unary_operator
-	: '&'
-	| '*'
-	| '+'
-	| '-'
-	| '~'
-	| '!'
-	;
-
-cast_expression
-	: unary_expression
-	| '(' type_name ')' cast_expression
-	;
-
-multiplicative_expression
-	: cast_expression
-	| multiplicative_expression '*' cast_expression
-	| multiplicative_expression '/' cast_expression
-	| multiplicative_expression '%' cast_expression
-	;
-
-additive_expression
-	: multiplicative_expression
-	| additive_expression '+' multiplicative_expression
-	| additive_expression '-' multiplicative_expression
-	;
-
-shift_expression
-	: additive_expression
-	| shift_expression LEFT_OP additive_expression
-	| shift_expression RIGHT_OP additive_expression
-	;
-
-relational_expression
-	: shift_expression
-	| relational_expression '<' shift_expression
-	| relational_expression '>' shift_expression
-	| relational_expression LE_OP shift_expression
-	| relational_expression GE_OP shift_expression
-	| relational_expression TH_OP shift_expression
-	;
-
-equality_expression
-	: relational_expression
-	| equality_expression EQ_OP relational_expression
-	| equality_expression NE_OP relational_expression
-	;
-
-and_expression
-	: equality_expression
-	| and_expression '&' equality_expression
-	;
-
-exclusive_or_expression
-	: and_expression
-	| exclusive_or_expression '^' and_expression
-	;
-
-inclusive_or_expression
-	: exclusive_or_expression
-	| inclusive_or_expression '|' exclusive_or_expression
-	;
-
-logical_and_expression
-	: inclusive_or_expression
-	| logical_and_expression AND_OP inclusive_or_expression
-	;
-
-logical_or_expression
-	: logical_and_expression
-	| logical_or_expression OR_OP logical_and_expression
-	;
-
-conditional_expression
-	: logical_or_expression
-	;
-
-assignment_expression
-	: conditional_expression
-	| unary_expression assignment_operator assignment_expression
-	;
-
-assignment_operator
-	: '='
-	| MUL_ASSIGN
-	| DIV_ASSIGN
-	| MOD_ASSIGN
-	| ADD_ASSIGN
-	| SUB_ASSIGN
-	| LEFT_ASSIGN
-	| RIGHT_ASSIGN
-	| AND_ASSIGN
-	| XOR_ASSIGN
-	| OR_ASSIGN
-	;
-
-expression
-	: assignment_expression
-	| expression ',' assignment_expression
-	;
-
-constant_expression
-	: conditional_expression	/* with constraints */
-	;
-
-declaration
-	: declaration_specifiers ';'
-	| declaration_specifiers init_declarator_list ';'
-	| static_assert_declaration
-	;
-
-declaration_specifiers
-	: storage_class_specifier declaration_specifiers
-	| storage_class_specifier
-	| type_specifier declaration_specifiers
-	| type_specifier
-	| type_qualifier declaration_specifiers
-	| type_qualifier
-	| function_specifier declaration_specifiers
-	| function_specifier
-	| alignment_specifier declaration_specifiers
-	| alignment_specifier
-	;
-
-init_declarator_list
-	: init_declarator
-	| init_declarator_list ',' init_declarator
-	;
-
-init_declarator
-	: declarator '=' initializer
-	| declarator
-	;
-
-storage_class_specifier
-	: TYPEDEF	/* identifiers must be flagged as TYPEDEF_NAME */
-	| EXTERN
-	| STATIC
-	| THREAD_LOCAL
-	| AUTO
-	| REGISTER
-	;
-
-type_specifier
-	: VOID
-	| CHAR
-	| SHORT
-	| INT
-	| LONG
-	| FLOAT
-	| DOUBLE
-	| SIGNED
-	| UNSIGNED
-	| BOOL
-	| COMPLEX
-	| IMAGINARY	  	/* non-mandated extension */
-	| atomic_type_specifier
-	| struct_or_union_specifier
-	| enum_specifier
-	| TYPEDEF_NAME		/* after it has been defined as such */
-	;
-
-struct_or_union_specifier
-	: struct_or_union '{' struct_declaration_list '}'
-	| struct_or_union IDENTIFIER '{' struct_declaration_list '}'
-	| struct_or_union IDENTIFIER
-	;
-
-struct_or_union
-	: STRUCT
-	| UNION
-	;
-
-struct_declaration_list
-	: struct_declaration
-	| struct_declaration_list struct_declaration
-	;
-
-struct_declaration
-	: specifier_qualifier_list ';'	/* for anonymous struct/union */
-	| specifier_qualifier_list struct_declarator_list ';'
-	| static_assert_declaration
-	;
-
-specifier_qualifier_list
-	: type_specifier specifier_qualifier_list
-	| type_specifier
-	| type_qualifier specifier_qualifier_list
-	| type_qualifier
-	;
-
-struct_declarator_list
-	: struct_declarator
-	| struct_declarator_list ',' struct_declarator
-	;
-
-struct_declarator
-	: ':' constant_expression
-	| declarator ':' constant_expression
-	| declarator
-	;
-
-enum_specifier
-	: ENUM '{' enumerator_list '}'
-	| ENUM '{' enumerator_list ',' '}'
-	| ENUM IDENTIFIER '{' enumerator_list '}'
-	| ENUM IDENTIFIER '{' enumerator_list ',' '}'
-	| ENUM IDENTIFIER
-	;
-
-enumerator_list
-	: enumerator
-	| enumerator_list ',' enumerator
-	;
-
-enumerator	/* identifiers must be flagged as ENUMERATION_CONSTANT */
-	: enumeration_constant '=' constant_expression
-	| enumeration_constant
-	;
-
-atomic_type_specifier
-	: ATOMIC '(' type_name ')'
-	;
-
-type_qualifier
-	: CONST
-	| RESTRICT
-	| VOLATILE
-	| ATOMIC
-	;
-
-function_specifier
-	: INLINE
-	| NORETURN
-	;
-
-alignment_specifier
-	: ALIGNAS '(' type_name ')'
-	| ALIGNAS '(' constant_expression ')'
-	;
-
-declarator
-	: pointer {pointer_decls++;} direct_declarator
-	| direct_declarator
-	;
-
-direct_declarator
-	: IDENTIFIER
-	| '(' declarator ')'
-	| direct_declarator '[' ']'
-	| direct_declarator '[' '*' ']'
-	| direct_declarator '[' STATIC type_qualifier_list assignment_expression ']'
-	| direct_declarator '[' STATIC assignment_expression ']'
-	| direct_declarator '[' type_qualifier_list '*' ']'
-	| direct_declarator '[' type_qualifier_list STATIC assignment_expression ']'
-	| direct_declarator '[' type_qualifier_list assignment_expression ']'
-	| direct_declarator '[' type_qualifier_list ']'
-	| direct_declarator '[' assignment_expression ']'
-	| direct_declarator '(' parameter_type_list ')' 
-	| direct_declarator '(' ')'
-	| direct_declarator '(' identifier_list ')'
-	;
-
-pointer
-	: '*' type_qualifier_list pointer
-	| '*' type_qualifier_list
-	| '*' pointer
-	| '*'
-	;
-
-type_qualifier_list
-	: type_qualifier
-	| type_qualifier_list type_qualifier
-	;
-
-
-parameter_type_list
-	: parameter_list ',' ELLIPSIS
-	| parameter_list
-	;
-
-parameter_list
-	: parameter_declaration
-	| parameter_list ',' parameter_declaration
-	;
-
-parameter_declaration
-	: declaration_specifiers declarator
-	| declaration_specifiers abstract_declarator
-	| declaration_specifiers
-	;
-
-identifier_list
-	: IDENTIFIER
-	| identifier_list ',' IDENTIFIER
-	;
-
-type_name
-	: specifier_qualifier_list abstract_declarator
-	| specifier_qualifier_list
-	;
-
-abstract_declarator
-	: pointer direct_abstract_declarator
-	| pointer
-	| direct_abstract_declarator
-	;
-
-direct_abstract_declarator
-	: '(' abstract_declarator ')'
-	| '[' ']'
-	| '[' '*' ']'
-	| '[' STATIC type_qualifier_list assignment_expression ']'
-	| '[' STATIC assignment_expression ']'
-	| '[' type_qualifier_list STATIC assignment_expression ']'
-	| '[' type_qualifier_list assignment_expression ']'
-	| '[' type_qualifier_list ']'
-	| '[' assignment_expression ']'
-	| direct_abstract_declarator '[' ']'
-	| direct_abstract_declarator '[' '*' ']'
-	| direct_abstract_declarator '[' STATIC type_qualifier_list assignment_expression ']'
-	| direct_abstract_declarator '[' STATIC assignment_expression ']'
-	| direct_abstract_declarator '[' type_qualifier_list assignment_expression ']'
-	| direct_abstract_declarator '[' type_qualifier_list STATIC assignment_expression ']'
-	| direct_abstract_declarator '[' type_qualifier_list ']'
-	| direct_abstract_declarator '[' assignment_expression ']'
-	| '(' ')'
-	| '(' parameter_type_list ')'
-	| direct_abstract_declarator '(' ')'
-	| direct_abstract_declarator '(' parameter_type_list ')'
-	;
-
-initializer
-	: '{' initializer_list '}'
-	| '{' initializer_list ',' '}'
-	| assignment_expression
-	;
-
-initializer_list
-	: designation initializer
-	| initializer
-	| initializer_list ',' designation initializer
-	| initializer_list ',' initializer
-	;
-
-designation
-	: designator_list '='
-	;
-
-designator_list
-	: designator
-	| designator_list designator
-	;
-
-designator
-	: '[' constant_expression ']'
-	| '.' IDENTIFIER
-	;
-
-static_assert_declaration
-	: STATIC_ASSERT '(' constant_expression ',' STRING_LITERAL ')' ';'
-	;
-
-statement
-	: labeled_statement
-	| compound_statement
-	| expression_statement
-	| selection_statement
-	| iteration_statement
-	| jump_statement
-	;
-
-labeled_statement
-	: IDENTIFIER ':' statement
-	| CASE constant_expression ':' statement
-	| DEFAULT ':' statement
-	;
-
-compound_statement
-	: '{' '}'
-	| '{'  block_item_list '}'
-	;
-
-block_item_list
-	: block_item
-	| block_item_list block_item
-	;
-
-block_item
-	: declaration
-	| statement
-	;
-
-expression_statement
-	: ';'
-	| expression ';'
-	;
-
-selection_statement
-	: IF '(' expression ')' statement ELSE {ladder_len++;$6=(ladder_len-1);} statement {if(ladder_len>=max){max=ladder_len;} /*printf("ladder_len=%d\n",ladder_len);*/ladder_len=$6;} 
-	| IF '(' expression ')' statement {ifs_wo_else++;}
-	| SWITCH '(' expression ')' statement
-	;
-
-iteration_statement
-	: WHILE '(' expression ')' statement
-	| DO statement WHILE '(' expression ')' ';'
-	| FOR '(' expression_statement expression_statement ')' statement
-	| FOR '(' expression_statement expression_statement expression ')' statement
-	| FOR '(' declaration expression_statement ')' statement
-	| FOR '(' declaration expression_statement expression ')' statement
-	;
-
-jump_statement
-	: GOTO IDENTIFIER ';'
-	| CONTINUE ';'
-	| BREAK ';'
-	| RETURN ';'
-	| RETURN expression ';'
-	;
-
-translation_unit
-	: external_declaration {global_declarations++;}
-	| translation_unit external_declaration {global_declarations++;}
-	;
-
-external_declaration
-	: function_definition {func_definitions++;}
-	| declaration
-	;
-
-function_definition
-	: declaration_specifiers declarator declaration_list compound_statement
-	| declaration_specifiers declarator compound_statement
-	;
-
-declaration_list
-	: declaration
-	| declaration_list declaration
-	;
-
-%%
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-char buff[2048];
-
-int yylex(void);
-int mode=-1;
-
-void yyerror(const char *s)
-{
-	fflush(stdout);
-	
-	if(mode==-1)
-		printf("***parsing terminated*** [syntax error]\n");
-	else if(mode==0 || mode==1)
-		printf("%s\n",s);
-		
-	exit(-1);
-}
-
-int main(int argc, char **argv)
-{
-    extern FILE *yyin;
-
-	if(argc<2)
-	{
-		sprintf(buff,"***process terminated*** [input error]: invalid number of command-line arguments");
-		mode=1;
-		yyerror(buff);
-		exit(1);
-	}
-
-	yyin=fopen(argv[1],"r");
-
-	if(yyin==NULL)
-	{
-		sprintf(buff,"***process terminated*** [input error]: no such file \"%s\" exists",argv[1]);
-		mode=1;
-		yyerror(buff);
-		exit(1);
-	}
-	else
-	{
-		do
-		{
-			yyparse();
-		}
-		while(!feof(yyin));
-	}
-
-	printf("***parsing successful***\n");
-	printf("#global_declarations = %d\n",global_declarations);
-	printf("#function_definitions = %d\n",func_definitions);
-	printf("#integer_constants = %d\n",int_consts);
-	printf("#pointers_declarations = %d\n",pointer_decls);
-	printf("#ifs_without_else = %d\n",ifs_wo_else);
-	printf("if-else max-depth = %d\n",((max<0)?0:max));
-
-	return(0);
 }
 
