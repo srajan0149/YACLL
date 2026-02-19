@@ -121,6 +121,8 @@ static int check_type(void);
 "@"                 {return (AT);}
 
 {WS}+					{ /* whitespace separates tokens */ }
+"..."      {return (ELLIPSIS);}
+
 .					{ /* discard bad characters */ }
 
 %%

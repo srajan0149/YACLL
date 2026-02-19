@@ -39,6 +39,7 @@ int max=-1;
 %left DOT_ADD DOT_SUB
 %left DOT_MUL DOT_DIV
 %left AT AT_MUL
+%token ELLIPSIS
 
 
 %union
@@ -441,6 +442,7 @@ parameter_type_list
 parameter_list
 	: parameter_declaration
 	| parameter_list ',' parameter_declaration
+	| parameter_list ',' ELLIPSIS
 	;
 
 parameter_declaration
