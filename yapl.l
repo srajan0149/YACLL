@@ -143,6 +143,7 @@ static int check_type(void);
 "./"                {return (DOT_DIV);}
 "@*"                {return (AT_MUL);}
 "@"                 {return (AT);}
+"'"                 { return (APOSTROPHE); }
 
 {WS}+					{ /* whitespace separates tokens */ }
 "..."      {return (ELLIPSIS);}
