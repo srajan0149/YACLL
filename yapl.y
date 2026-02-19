@@ -40,6 +40,8 @@ int max=-1;
 %left DOT_MUL DOT_DIV
 %left AT AT_MUL
 %token ELLIPSIS
+%token APOSTROPHE
+
 
 
 %union
@@ -300,24 +302,8 @@ tensor_params
     : type_specifier ',' dimension_list
     ;
 
-iteration_statement
-    : FOR ITEM IN IDENTIFIER axis_clause compound_statement
-    ;
-
-axis_clause
-    : /* empty */
-    | AXIS '(' axis_list ')'
-    ;
-
-axis_list
-    : I_CONSTANT
-    | axis_list ',' I_CONSTANT
-    ;
-
-
-dimension_list
-    : I_CONSTANT
-    | dimension_list ',' I_CONSTANT
+loop_label
+    : APOSTROPHE IDENTIFIER ':'
     ;
 
 struct_or_union_specifier
@@ -563,19 +549,42 @@ selection_statement
 	| SWITCH '(' expression ')' statement
 	;
 
-iteration_statement
+loop_statement
 	: WHILE '(' expression ')' statement
 	| DO statement WHILE '(' expression ')' ';'
 	| FOR '(' expression_statement expression_statement ')' statement
 	| FOR '(' expression_statement expression_statement expression ')' statement
 	| FOR '(' declaration expression_statement ')' statement
 	| FOR '(' declaration expression_statement expression ')' statement
+	| FOR ITEM IN IDENTIFIER axis_clause compound_statement
 	;
+iteration_statement
+    : loop_statement
+    | loop_label loop_statement
+    ;
+
+axis_clause
+    : /* empty */
+    | AXIS '(' axis_list ')'
+    ;
+
+axis_list
+    : I_CONSTANT
+    | axis_list ',' I_CONSTANT
+    ;
+
+
+dimension_list
+    : I_CONSTANT
+    | dimension_list ',' I_CONSTANT
+    ;
 
 jump_statement
 	: GOTO IDENTIFIER ';'
 	| CONTINUE ';'
+	| CONTINUE IDENTIFIER ';'
 	| BREAK ';'
+	| BREAK IDENTIFIER ';'
 	| RETURN ';'
 	| RETURN expression ';'
 	;
