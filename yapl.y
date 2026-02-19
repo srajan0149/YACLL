@@ -36,6 +36,9 @@ int max=-1;
 %token TENSOR ITEM AXIS IN
 %token DOT_ADD DOT_SUB DOT_MUL DOT_DIV
 %token AT AT_MUL
+%left DOT_ADD DOT_SUB
+%left DOT_MUL DOT_DIV
+%left AT AT_MUL
 
 
 %union
@@ -83,9 +86,16 @@ generic_association
 	| DEFAULT ':' assignment_expression
 	;
 
+slice_expression
+    : expression
+    | ':'
+    | slice_expression ',' slice_expression
+    ;
+
 postfix_expression
 	: primary_expression
 	| postfix_expression '[' expression ']'
+	| postfix_expression '[' slice_expression ']'
 	| postfix_expression '(' ')'
 	| postfix_expression '(' argument_expression_list ')'
 	| postfix_expression '.' IDENTIFIER
@@ -210,6 +220,12 @@ assignment_operator
 expression
 	: assignment_expression
 	| expression ',' assignment_expression
+	| expression DOT_ADD expression
+	| expression DOT_SUB expression
+    | expression DOT_MUL expression
+    | expression DOT_DIV expression
+    | expression AT expression
+    | expression AT_MUL expression
 	;
 
 constant_expression
@@ -282,6 +298,21 @@ tensor_type
 tensor_params
     : type_specifier ',' dimension_list
     ;
+
+iteration_statement
+    : FOR ITEM IN IDENTIFIER axis_clause compound_statement
+    ;
+
+axis_clause
+    : /* empty */
+    | AXIS '(' axis_list ')'
+    ;
+
+axis_list
+    : I_CONSTANT
+    | axis_list ',' I_CONSTANT
+    ;
+
 
 dimension_list
     : I_CONSTANT
