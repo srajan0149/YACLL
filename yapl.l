@@ -1,5 +1,6 @@
 O   [0-7]
 D   [0-9]
+DU  {D}({D}|_)*
 NZ  [1-9]
 L   [a-zA-Z_]
 A   [a-zA-Z_0-9]
@@ -64,12 +65,35 @@ static int check_type(void);
 "in"                    {return (IN);}
 
 {L}{A}*					{ return check_type(); }
+{DU}                {
+                        char buf[256];
+                        int j = 0;
+                        for (int i = 0; yytext[i]; i++) {
+                            if (yytext[i] != '_')
+                                buf[j++] = yytext[i];
+                        }
+                        buf[j] = '\0';
 
+                        yylval.intval = atoi(buf);
+                        return I_CONSTANT;
+                    }
 {HP}{H}+{IS}?				{ return I_CONSTANT; }
 {NZ}{D}*{IS}?				{ return I_CONSTANT; }
 "0"{O}*{IS}?				{ return I_CONSTANT; }
 {CP}?"'"([^'\\\n]|{ES})+"'"		{ return I_CONSTANT; }
 
+{DU}"."{DU}             {
+                            char buf[256];
+                            int j = 0;
+                            for (int i = 0; yytext[i]; i++) {
+                                if (yytext[i] != '_')
+                                    buf[j++] = yytext[i];
+                            }
+                            buf[j] = '\0';
+
+                            yylval.fval = atof(buf);
+                            return F_CONSTANT;
+                        }
 {D}+{E}{FS}?				{ return F_CONSTANT; }
 {D}*"."{D}+{E}?{FS}?			{ return F_CONSTANT; }
 {D}+"."{E}?{FS}?			{ return F_CONSTANT; }
