@@ -9,6 +9,9 @@ int pointer_decls=0;
 int ifs_wo_else=0;
 int ladder_len=0,hold=0;
 int max=-1;
+/* avoid implicit declarations in generated y.tab.c */
+int yylex(void);
+void yyerror(const char *);
 %}
 
 %token	IDENTIFIER I_CONSTANT F_CONSTANT STRING_LITERAL FUNC_NAME SIZEOF
@@ -30,8 +33,6 @@ int max=-1;
 
 %start translation_unit
 
-%type <val> IF
-%type <val> ELSE
 %token TEXT
 %token TENSOR ITEM AXIS IN
 %token DOT_ADD DOT_SUB DOT_MUL DOT_DIV
@@ -39,7 +40,6 @@ int max=-1;
 %left DOT_ADD DOT_SUB
 %left DOT_MUL DOT_DIV
 %left AT AT_MUL
-%token ELLIPSIS
 %token APOSTROPHE
 
 
@@ -47,6 +47,9 @@ int max=-1;
 %union
 {
 	int val;
+	int ival;
+    double fval;
+    char *sval;
 	struct symtab *symp;
 }
 
@@ -544,10 +547,23 @@ expression_statement
 	;
 
 selection_statement
-	: IF '(' expression ')' statement ELSE {ladder_len++;$6=(ladder_len-1);} statement {if(ladder_len>=max){max=ladder_len;} /*printf("ladder_len=%d\n",ladder_len);*/ladder_len=$6;} 
-	| IF '(' expression ')' statement {ifs_wo_else++;}
-	| SWITCH '(' expression ')' statement
-	;
+    : IF '(' expression ')' statement ELSE
+      {
+          ladder_len++;
+      }
+      statement
+      {
+          if (ladder_len >= max) {
+              max = ladder_len;
+          }
+          ladder_len--;
+      }
+    | IF '(' expression ')' statement
+      {
+          ifs_wo_else++;
+      }
+    | SWITCH '(' expression ')' statement
+    ;
 
 loop_statement
 	: WHILE '(' expression ')' statement

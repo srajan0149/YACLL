@@ -100,7 +100,7 @@ extern int yydebug;
     LONG = 301,                    /* LONG  */
     SIGNED = 302,                  /* SIGNED  */
     UNSIGNED = 303,                /* UNSIGNED  */
-    FLOAT = 304,                   /* FLOAT  */
+    FP = 304,                      /* FP  */
     DOUBLE = 305,                  /* DOUBLE  */
     VOID = 306,                    /* VOID  */
     COMPLEX = 307,                 /* COMPLEX  */
@@ -127,7 +127,19 @@ extern int yydebug;
     GENERIC = 328,                 /* GENERIC  */
     NORETURN = 329,                /* NORETURN  */
     STATIC_ASSERT = 330,           /* STATIC_ASSERT  */
-    THREAD_LOCAL = 331             /* THREAD_LOCAL  */
+    THREAD_LOCAL = 331,            /* THREAD_LOCAL  */
+    TEXT = 332,                    /* TEXT  */
+    TENSOR = 333,                  /* TENSOR  */
+    ITEM = 334,                    /* ITEM  */
+    AXIS = 335,                    /* AXIS  */
+    IN = 336,                      /* IN  */
+    DOT_ADD = 337,                 /* DOT_ADD  */
+    DOT_SUB = 338,                 /* DOT_SUB  */
+    DOT_MUL = 339,                 /* DOT_MUL  */
+    DOT_DIV = 340,                 /* DOT_DIV  */
+    AT = 341,                      /* AT  */
+    AT_MUL = 342,                  /* AT_MUL  */
+    APOSTROPHE = 343               /* APOSTROPHE  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -182,7 +194,7 @@ extern int yydebug;
 #define LONG 301
 #define SIGNED 302
 #define UNSIGNED 303
-#define FLOAT 304
+#define FP 304
 #define DOUBLE 305
 #define VOID 306
 #define COMPLEX 307
@@ -210,17 +222,32 @@ extern int yydebug;
 #define NORETURN 329
 #define STATIC_ASSERT 330
 #define THREAD_LOCAL 331
+#define TEXT 332
+#define TENSOR 333
+#define ITEM 334
+#define AXIS 335
+#define IN 336
+#define DOT_ADD 337
+#define DOT_SUB 338
+#define DOT_MUL 339
+#define DOT_DIV 340
+#define AT 341
+#define AT_MUL 342
+#define APOSTROPHE 343
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 37 "yapl.y"
+#line 48 "yapl.y"
 
 	int val;
+	int ival;
+    double fval;
+    char *sval;
 	struct symtab *symp;
 
-#line 224 "y.tab.h"
+#line 251 "y.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
