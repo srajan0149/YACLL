@@ -1,6 +1,7 @@
 O   [0-7]           // octal digit
 D   [0-9]           // decimal digit
-NZ  [1-9]           
+NZ  [1-9]           // non zero digit
+DU  {D}({D}|_)*     // digit or digit separator
 L   [a-zA-Z_]       // identifier first letter
 A   [a-zA-Z_0-9]    // identifier letters
 H   [a-fA-F0-9]     // hexadecimal digit
