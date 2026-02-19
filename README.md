@@ -13,7 +13,17 @@ Yet Another C Like Language
 
 ## Build Instructions
 
-## Run Instructions
+Run the command below to execute the Makefile.
+```Shell
+make yapl
+```
+
+## Test Instructions
+
+The file YACLL_TEST.c has a few test functions that uses all possible tokens in YACLL to test the lexer. It can be executed with the following command.
+```Shell
+./yapl YACLL_TEST.c
+```
 
 ## Important Files
 
