@@ -20,7 +20,7 @@ int max=-1;
 
 %token	TYPEDEF EXTERN STATIC AUTO REGISTER INLINE
 %token	CONST RESTRICT VOLATILE
-%token	BOOL CHAR SHORT INT LONG SIGNED UNSIGNED FLOAT DOUBLE VOID
+%token	BOOL CHAR SHORT INT LONG SIGNED UNSIGNED FP DOUBLE VOID
 %token	COMPLEX IMAGINARY 
 %token	STRUCT UNION ENUM ELLIPSIS
 
@@ -32,6 +32,11 @@ int max=-1;
 
 %type <val> IF
 %type <val> ELSE
+%token TEXT
+%token TENSOR ITEM AXIS IN
+%token DOT_ADD DOT_SUB DOT_MUL DOT_DIV
+%token AT AT_MUL
+
 
 %union
 {
@@ -255,10 +260,12 @@ type_specifier
 	| SHORT
 	| INT
 	| LONG
-	| FLOAT
+	| FP
 	| DOUBLE
 	| SIGNED
 	| UNSIGNED
+	| TEXT
+	| tensor_type
 	| BOOL
 	| COMPLEX
 	| IMAGINARY	  	/* non-mandated extension */
@@ -267,6 +274,19 @@ type_specifier
 	| enum_specifier
 	| TYPEDEF_NAME		/* after it has been defined as such */
 	;
+
+tensor_type
+	: TENSOR '<' tensor_params '>'
+    ;
+
+tensor_params
+    : type_specifier ',' dimension_list
+    ;
+
+dimension_list
+    : I_CONSTANT
+    | dimension_list ',' I_CONSTANT
+    ;
 
 struct_or_union_specifier
 	: struct_or_union '{' struct_declaration_list '}'

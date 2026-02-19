@@ -45,7 +45,8 @@ static int check_type(void);
 "double"				{ return(DOUBLE); }
 "else"					{ return(ELSE); }
 "extern"				{ return(EXTERN); }
-"float"					{ return(FLOAT); }
+"fp"					{ return(FP); }
+"text"                  {return(TEXT);}
 "for"					{ return(FOR); }
 "if"					{ return(IF); }
 "int"					{ return(INT); }
@@ -57,6 +58,10 @@ static int check_type(void);
 "switch"				{ return(SWITCH); }
 "void"					{ return(VOID); }
 "while"					{ return(WHILE); }
+"tensor"                {return(TENSOR);}
+"item"                  {return (ITEM);}
+"axis"                  {return (AXIS);}
+"in"                    {return (IN);}
 
 {L}{A}*					{ return check_type(); }
 
@@ -108,6 +113,12 @@ static int check_type(void);
 "^"					{ return '^'; }
 "|"					{ return '|'; }
 "?"					{ return '?'; }
+".+"                {return (DOT_ADD);}
+".-"                {return (DOT_SUB);}
+".*"                {return (DOT_MUL);}
+"./"                {return (DOT_DIV);}
+"@*"                {return (AT_MUL);}
+"@"                 {return (AT);}
 
 {WS}+					{ /* whitespace separates tokens */ }
 .					{ /* discard bad characters */ }
