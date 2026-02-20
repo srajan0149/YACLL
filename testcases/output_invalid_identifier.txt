@@ -1,0 +1,2 @@
+***parsing terminated*** [syntax error]
+ error at line 7 near '9'
