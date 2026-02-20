@@ -5,3 +5,4 @@ https://en.wikipedia.org/wiki/Yacc
 https://en.wikipedia.org/wiki/GNU_Bison
 https://www.ibm.com/docs/en/aix/7.1.0?topic=information-example-program-lex-yacc-programs
 A Compact Guide to Lex and Yacc - Thomas Niemann
+https://ftp.gnu.org/old-gnu/Manuals/flex-2.5.4/html_mono/flex.html#SEC17

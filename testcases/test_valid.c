@@ -12,7 +12,7 @@ int types_and_operators(){
         bool invalid = false&&(5>=90) || !(5>6) && true||false; // bool, logical operators
         text n = "the answer to life, the universe, and everything"; // text
         fp float = 42.0; // fp
-    }
+    };
     struct tested T;
     struct tested *T;
     const int _0 = 0; // const, identifier name test
@@ -45,7 +45,7 @@ void tensors(int x, int y){ // just to test function call and definition syntax 
 }
 
 void loops(){ // testing labelled loops
-    `loop_label1: // single forward apostrophe
+    `loop_label1: // single forward BACKTICK
     while(True){
         int i = 0;
         while(True){
@@ -55,7 +55,7 @@ void loops(){ // testing labelled loops
             else if (i>100){
                 i=i+3;
             }
-            i+=1;
+            i=i+1;
         }
     }
 }

@@ -2,13 +2,28 @@
 %{
 #include<stdio.h>
 extern char *yytext;
+extern int yylineno;
 int global_declarations=0;
 int func_definitions=0;
 int int_consts=0;
+int float_consts=0;
+int string_literals=0;
 int pointer_decls=0;
+int tensor_definitions=0;
+int slice_expressions_count=0;
+int tensor_elementwise_ops=0;
+int tensor_contractions=0;
+int tensor_products=0;
+int tensor_loops=0;
+int loop_labels_count=0;
+int labeled_breaks=0;
+int labeled_continues=0;
 int ifs_wo_else=0;
 int ladder_len=0,hold=0;
 int max=-1;
+/* avoid implicit declarations in generated y.tab.c */
+int yylex(void);
+void yyerror(const char *);
 %}
 
 %token	IDENTIFIER I_CONSTANT F_CONSTANT STRING_LITERAL FUNC_NAME SIZEOF
@@ -20,7 +35,7 @@ int max=-1;
 
 %token	TYPEDEF EXTERN STATIC AUTO REGISTER INLINE
 %token	CONST RESTRICT VOLATILE
-%token	BOOL CHAR SHORT INT LONG SIGNED UNSIGNED FLOAT DOUBLE VOID
+%token	BOOL CHAR SHORT INT LONG SIGNED UNSIGNED FP DOUBLE VOID
 %token	COMPLEX IMAGINARY 
 %token	STRUCT UNION ENUM ELLIPSIS
 
@@ -30,12 +45,25 @@ int max=-1;
 
 %start translation_unit
 
-%type <val> IF
-%type <val> ELSE
+%token TEXT
+%token TENSOR ITEM AXIS IN
+%token DOT_ADD DOT_SUB DOT_MUL DOT_DIV
+%token AT AT_MUL
+%left DOT_ADD DOT_SUB
+%left DOT_MUL DOT_DIV
+%left AT AT_MUL
+%token BACKTICK 
+
+%type <ival> slice_expression slice_item
+
+
 
 %union
 {
 	int val;
+	int ival;
+    double fval;
+    char *sval;
 	struct symtab *symp;
 }
 
@@ -51,7 +79,7 @@ primary_expression
 
 constant
 	: I_CONSTANT {int_consts++;}	/* includes character_constant */
-	| F_CONSTANT
+	| F_CONSTANT {float_consts++;}
 	| ENUMERATION_CONSTANT	/* after it has been defined as such */
 	;
 
@@ -60,7 +88,7 @@ enumeration_constant		/* before it has been defined as such */
 	;
 
 string
-	: STRING_LITERAL
+	: STRING_LITERAL {string_literals++;}
 	| FUNC_NAME
 	;
 
@@ -78,9 +106,19 @@ generic_association
 	| DEFAULT ':' assignment_expression
 	;
 
+slice_item
+	: assignment_expression { $$ = 0; }
+	| ':' { $$ = 1; }
+	;
+
+slice_expression
+	: slice_item { $$ = $1; }
+	| slice_expression ',' slice_item { $$ = ($1 || $3); }
+	;
+
 postfix_expression
 	: primary_expression
-	| postfix_expression '[' expression ']'
+	| postfix_expression '[' slice_expression ']' { if ($3) slice_expressions_count++; }
 	| postfix_expression '(' ')'
 	| postfix_expression '(' argument_expression_list ')'
 	| postfix_expression '.' IDENTIFIER
@@ -125,12 +163,18 @@ multiplicative_expression
 	| multiplicative_expression '*' cast_expression
 	| multiplicative_expression '/' cast_expression
 	| multiplicative_expression '%' cast_expression
+	| multiplicative_expression DOT_MUL cast_expression {tensor_elementwise_ops++;}
+	| multiplicative_expression DOT_DIV cast_expression {tensor_elementwise_ops++;}
+	| multiplicative_expression AT cast_expression {tensor_contractions++;}
+	| multiplicative_expression AT_MUL cast_expression {tensor_products++;}
 	;
 
 additive_expression
 	: multiplicative_expression
 	| additive_expression '+' multiplicative_expression
 	| additive_expression '-' multiplicative_expression
+	| additive_expression DOT_ADD multiplicative_expression {tensor_elementwise_ops++;}
+	| additive_expression DOT_SUB multiplicative_expression {tensor_elementwise_ops++;}
 	;
 
 shift_expression
@@ -255,10 +299,12 @@ type_specifier
 	| SHORT
 	| INT
 	| LONG
-	| FLOAT
+	| FP
 	| DOUBLE
 	| SIGNED
 	| UNSIGNED
+	| TEXT
+	| tensor_type
 	| BOOL
 	| COMPLEX
 	| IMAGINARY	  	/* non-mandated extension */
@@ -267,6 +313,18 @@ type_specifier
 	| enum_specifier
 	| TYPEDEF_NAME		/* after it has been defined as such */
 	;
+
+tensor_type
+	: TENSOR '<' tensor_params '>' {tensor_definitions++;}
+    ;
+
+tensor_params
+    : type_specifier ',' dimension_list
+    ;
+
+loop_label
+	: BACKTICK  IDENTIFIER ':' {loop_labels_count++;}
+    ;
 
 struct_or_union_specifier
 	: struct_or_union '{' struct_declaration_list '}'
@@ -305,6 +363,7 @@ struct_declarator_list
 struct_declarator
 	: ':' constant_expression
 	| declarator ':' constant_expression
+	| declarator '=' initializer
 	| declarator
 	;
 
@@ -390,6 +449,7 @@ parameter_type_list
 parameter_list
 	: parameter_declaration
 	| parameter_list ',' parameter_declaration
+	| parameter_list ',' ELLIPSIS
 	;
 
 parameter_declaration
@@ -505,30 +565,67 @@ expression_statement
 	;
 
 selection_statement
-	: IF '(' expression ')' statement ELSE {ladder_len++;$6=(ladder_len-1);} statement {if(ladder_len>=max){max=ladder_len;} /*printf("ladder_len=%d\n",ladder_len);*/ladder_len=$6;} 
-	| IF '(' expression ')' statement {ifs_wo_else++;}
-	| SWITCH '(' expression ')' statement
-	;
+    : IF '(' expression ')' statement ELSE
+      {
+          ladder_len++;
+      }
+      statement
+      {
+          if (ladder_len >= max) {
+              max = ladder_len;
+          }
+          ladder_len--;
+      }
+    | IF '(' expression ')' statement
+      {
+          ifs_wo_else++;
+      }
+    | SWITCH '(' expression ')' statement
+    ;
 
-iteration_statement
+loop_statement
 	: WHILE '(' expression ')' statement
 	| DO statement WHILE '(' expression ')' ';'
 	| FOR '(' expression_statement expression_statement ')' statement
 	| FOR '(' expression_statement expression_statement expression ')' statement
 	| FOR '(' declaration expression_statement ')' statement
 	| FOR '(' declaration expression_statement expression ')' statement
+	| FOR IDENTIFIER IN IDENTIFIER axis_clause compound_statement {tensor_loops++;}
 	;
+iteration_statement
+    : loop_statement
+    | loop_label loop_statement
+    ;
+
+axis_clause
+    : /* empty */
+    | AXIS '(' axis_list ')'
+    ;
+
+axis_list
+    : I_CONSTANT
+    | axis_list ',' I_CONSTANT
+    ;
+
+
+dimension_list
+    : I_CONSTANT
+    | dimension_list ',' I_CONSTANT
+    ;
 
 jump_statement
 	: GOTO IDENTIFIER ';'
 	| CONTINUE ';'
+	| CONTINUE IDENTIFIER ';' {labeled_continues++;}
 	| BREAK ';'
+	| BREAK IDENTIFIER ';' {labeled_breaks++;}
 	| RETURN ';'
 	| RETURN expression ';'
 	;
 
 translation_unit
-	: external_declaration {global_declarations++;}
+	: /* empty */
+	| external_declaration {global_declarations++;}
 	| translation_unit external_declaration {global_declarations++;}
 	;
 
@@ -562,9 +659,9 @@ void yyerror(const char *s)
 	fflush(stdout);
 	
 	if(mode==-1)
-		printf("***parsing terminated*** [syntax error]\n");
+		fprintf(stderr, "***parsing terminated*** [syntax error]\n error at line %d near '%s'\n", yylineno, yytext);
 	else if(mode==0 || mode==1)
-		printf("%s\n",s);
+		fprintf(stderr, "%s\n syntax error at line %d near '%s'",s, yylineno, yytext);
 		
 	exit(-1);
 }
@@ -603,7 +700,18 @@ int main(int argc, char **argv)
 	printf("#global_declarations = %d\n",global_declarations);
 	printf("#function_definitions = %d\n",func_definitions);
 	printf("#integer_constants = %d\n",int_consts);
+	printf("#floating_constants = %d\n",float_consts);
+	printf("#string_literals = %d\n",string_literals);
 	printf("#pointers_declarations = %d\n",pointer_decls);
+	printf("#tensor_definitions = %d\n",tensor_definitions);
+	printf("#slice_expressions = %d\n",slice_expressions_count);
+	printf("#tensor_elementwise_ops = %d\n",tensor_elementwise_ops);
+	printf("#tensor_contractions = %d\n",tensor_contractions);
+	printf("#tensor_products = %d\n",tensor_products);
+	printf("#tensor_loops = %d\n",tensor_loops);
+	printf("#loop_labels = %d\n",loop_labels_count);
+	printf("#labeled_breaks = %d\n",labeled_breaks);
+	printf("#labeled_continues = %d\n",labeled_continues);
 	printf("#ifs_without_else = %d\n",ifs_wo_else);
 	printf("if-else max-depth = %d\n",((max<0)?0:max));
 
