@@ -147,7 +147,8 @@ WS  [ \t\v\n\f]
 "./"                                    { return DOT_DIV; }
 "@*"                                    { return AT_MUL; }
 "@"                                     { return AT; }
-"'"                                     { return APOSTROPHE; }
+"'"                                     { return BACKTICK; }
+"`"                                     { return BACKTICK; }
 "..."                                   { return ELLIPSIS; }
 
 {WS}+                                   { }

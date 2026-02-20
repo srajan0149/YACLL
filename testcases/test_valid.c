@@ -45,7 +45,7 @@ void tensors(int x, int y){ // just to test function call and definition syntax 
 }
 
 void loops(){ // testing labelled loops
-    `loop_label1: // single forward apostrophe
+    `loop_label1: // single forward BACKTICK
     while(True){
         int i = 0;
         while(True){

@@ -52,7 +52,7 @@ void yyerror(const char *);
 %left DOT_ADD DOT_SUB
 %left DOT_MUL DOT_DIV
 %left AT AT_MUL
-%token APOSTROPHE
+%token BACKTICK 
 
 %type <ival> slice_expression slice_item
 
@@ -323,7 +323,7 @@ tensor_params
     ;
 
 loop_label
-	: APOSTROPHE IDENTIFIER ':' {loop_labels_count++;}
+	: BACKTICK  IDENTIFIER ':' {loop_labels_count++;}
     ;
 
 struct_or_union_specifier
