@@ -5,7 +5,18 @@ extern char *yytext;
 int global_declarations=0;
 int func_definitions=0;
 int int_consts=0;
+int float_consts=0;
+int string_literals=0;
 int pointer_decls=0;
+int tensor_definitions=0;
+int slice_expressions_count=0;
+int tensor_elementwise_ops=0;
+int tensor_contractions=0;
+int tensor_products=0;
+int tensor_loops=0;
+int loop_labels_count=0;
+int labeled_breaks=0;
+int labeled_continues=0;
 int ifs_wo_else=0;
 int ladder_len=0,hold=0;
 int max=-1;
@@ -42,6 +53,8 @@ void yyerror(const char *);
 %left AT AT_MUL
 %token APOSTROPHE
 
+%type <ival> slice_expression slice_item
+
 
 
 %union
@@ -65,7 +78,7 @@ primary_expression
 
 constant
 	: I_CONSTANT {int_consts++;}	/* includes character_constant */
-	| F_CONSTANT
+	| F_CONSTANT {float_consts++;}
 	| ENUMERATION_CONSTANT	/* after it has been defined as such */
 	;
 
@@ -74,7 +87,7 @@ enumeration_constant		/* before it has been defined as such */
 	;
 
 string
-	: STRING_LITERAL
+	: STRING_LITERAL {string_literals++;}
 	| FUNC_NAME
 	;
 
@@ -92,16 +105,19 @@ generic_association
 	| DEFAULT ':' assignment_expression
 	;
 
+slice_item
+	: assignment_expression { $$ = 0; }
+	| ':' { $$ = 1; }
+	;
+
 slice_expression
-    : expression
-    | ':'
-    | slice_expression ',' slice_expression
-    ;
+	: slice_item { $$ = $1; }
+	| slice_expression ',' slice_item { $$ = ($1 || $3); }
+	;
 
 postfix_expression
 	: primary_expression
-	| postfix_expression '[' expression ']'
-	| postfix_expression '[' slice_expression ']'
+	| postfix_expression '[' slice_expression ']' { if ($3) slice_expressions_count++; }
 	| postfix_expression '(' ')'
 	| postfix_expression '(' argument_expression_list ')'
 	| postfix_expression '.' IDENTIFIER
@@ -226,12 +242,12 @@ assignment_operator
 expression
 	: assignment_expression
 	| expression ',' assignment_expression
-	| expression DOT_ADD expression
-	| expression DOT_SUB expression
-    | expression DOT_MUL expression
-    | expression DOT_DIV expression
-    | expression AT expression
-    | expression AT_MUL expression
+	| expression DOT_ADD expression {tensor_elementwise_ops++;}
+	| expression DOT_SUB expression {tensor_elementwise_ops++;}
+	| expression DOT_MUL expression {tensor_elementwise_ops++;}
+	| expression DOT_DIV expression {tensor_elementwise_ops++;}
+	| expression AT expression {tensor_contractions++;}
+	| expression AT_MUL expression {tensor_products++;}
 	;
 
 constant_expression
@@ -298,7 +314,7 @@ type_specifier
 	;
 
 tensor_type
-	: TENSOR '<' tensor_params '>'
+	: TENSOR '<' tensor_params '>' {tensor_definitions++;}
     ;
 
 tensor_params
@@ -306,7 +322,7 @@ tensor_params
     ;
 
 loop_label
-    : APOSTROPHE IDENTIFIER ':'
+	: APOSTROPHE IDENTIFIER ':' {loop_labels_count++;}
     ;
 
 struct_or_union_specifier
@@ -572,7 +588,7 @@ loop_statement
 	| FOR '(' expression_statement expression_statement expression ')' statement
 	| FOR '(' declaration expression_statement ')' statement
 	| FOR '(' declaration expression_statement expression ')' statement
-	| FOR ITEM IN IDENTIFIER axis_clause compound_statement
+	| FOR ITEM IN IDENTIFIER axis_clause compound_statement {tensor_loops++;}
 	;
 iteration_statement
     : loop_statement
@@ -598,15 +614,16 @@ dimension_list
 jump_statement
 	: GOTO IDENTIFIER ';'
 	| CONTINUE ';'
-	| CONTINUE IDENTIFIER ';'
+	| CONTINUE IDENTIFIER ';' {labeled_continues++;}
 	| BREAK ';'
-	| BREAK IDENTIFIER ';'
+	| BREAK IDENTIFIER ';' {labeled_breaks++;}
 	| RETURN ';'
 	| RETURN expression ';'
 	;
 
 translation_unit
-	: external_declaration {global_declarations++;}
+	: /* empty */
+	| external_declaration {global_declarations++;}
 	| translation_unit external_declaration {global_declarations++;}
 	;
 
@@ -681,7 +698,18 @@ int main(int argc, char **argv)
 	printf("#global_declarations = %d\n",global_declarations);
 	printf("#function_definitions = %d\n",func_definitions);
 	printf("#integer_constants = %d\n",int_consts);
+	printf("#floating_constants = %d\n",float_consts);
+	printf("#string_literals = %d\n",string_literals);
 	printf("#pointers_declarations = %d\n",pointer_decls);
+	printf("#tensor_definitions = %d\n",tensor_definitions);
+	printf("#slice_expressions = %d\n",slice_expressions_count);
+	printf("#tensor_elementwise_ops = %d\n",tensor_elementwise_ops);
+	printf("#tensor_contractions = %d\n",tensor_contractions);
+	printf("#tensor_products = %d\n",tensor_products);
+	printf("#tensor_loops = %d\n",tensor_loops);
+	printf("#loop_labels = %d\n",loop_labels_count);
+	printf("#labeled_breaks = %d\n",labeled_breaks);
+	printf("#labeled_continues = %d\n",labeled_continues);
 	printf("#ifs_without_else = %d\n",ifs_wo_else);
 	printf("if-else max-depth = %d\n",((max<0)?0:max));
 
