@@ -38,8 +38,10 @@ WS  [ \t\v\n\f]
 "//".*                                  { }
 
 "break"                                 { return(BREAK); }
+"bool"                                  { return(BOOL); }
 "case"                                  { return(CASE); }
 "char"                                  { return(CHAR); }
+"const"                                 { return(CONST); }
 "continue"                              { return(CONTINUE); }
 "default"                               { return(DEFAULT); }
 "do"                                    { return(DO); }
@@ -60,7 +62,6 @@ WS  [ \t\v\n\f]
 "void"                                  { return(VOID); }
 "while"                                 { return(WHILE); }
 "tensor"                                { return(TENSOR); }
-"item"                                  { return(ITEM); }
 "axis"                                  { return(AXIS); }
 "in"                                    { return(IN); }
 

@@ -12,7 +12,7 @@ int types_and_operators(){
         bool invalid = false&&(5>=90) || !(5>6) && true||false; // bool, logical operators
         text n = "the answer to life, the universe, and everything"; // text
         fp float = 42.0; // fp
-    }
+    };
     struct tested T;
     struct tested *T;
     const int _0 = 0; // const, identifier name test
@@ -55,7 +55,7 @@ void loops(){ // testing labelled loops
             else if (i>100){
                 i=i+3;
             }
-            i+=1;
+            i=i+1;
         }
     }
 }

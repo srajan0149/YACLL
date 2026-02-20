@@ -162,12 +162,18 @@ multiplicative_expression
 	| multiplicative_expression '*' cast_expression
 	| multiplicative_expression '/' cast_expression
 	| multiplicative_expression '%' cast_expression
+	| multiplicative_expression DOT_MUL cast_expression {tensor_elementwise_ops++;}
+	| multiplicative_expression DOT_DIV cast_expression {tensor_elementwise_ops++;}
+	| multiplicative_expression AT cast_expression {tensor_contractions++;}
+	| multiplicative_expression AT_MUL cast_expression {tensor_products++;}
 	;
 
 additive_expression
 	: multiplicative_expression
 	| additive_expression '+' multiplicative_expression
 	| additive_expression '-' multiplicative_expression
+	| additive_expression DOT_ADD multiplicative_expression {tensor_elementwise_ops++;}
+	| additive_expression DOT_SUB multiplicative_expression {tensor_elementwise_ops++;}
 	;
 
 shift_expression
@@ -242,12 +248,6 @@ assignment_operator
 expression
 	: assignment_expression
 	| expression ',' assignment_expression
-	| expression DOT_ADD expression {tensor_elementwise_ops++;}
-	| expression DOT_SUB expression {tensor_elementwise_ops++;}
-	| expression DOT_MUL expression {tensor_elementwise_ops++;}
-	| expression DOT_DIV expression {tensor_elementwise_ops++;}
-	| expression AT expression {tensor_contractions++;}
-	| expression AT_MUL expression {tensor_products++;}
 	;
 
 constant_expression
@@ -362,6 +362,7 @@ struct_declarator_list
 struct_declarator
 	: ':' constant_expression
 	| declarator ':' constant_expression
+	| declarator '=' initializer
 	| declarator
 	;
 
@@ -588,7 +589,7 @@ loop_statement
 	| FOR '(' expression_statement expression_statement expression ')' statement
 	| FOR '(' declaration expression_statement ')' statement
 	| FOR '(' declaration expression_statement expression ')' statement
-	| FOR ITEM IN IDENTIFIER axis_clause compound_statement {tensor_loops++;}
+	| FOR IDENTIFIER IN IDENTIFIER axis_clause compound_statement {tensor_loops++;}
 	;
 iteration_statement
     : loop_statement
