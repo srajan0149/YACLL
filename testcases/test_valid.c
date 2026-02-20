@@ -41,7 +41,8 @@ void tensors(int x, int y){ // just to test function call and definition syntax 
         int i = item.indices[0];
     }
 
-    int x = a[0][0];
+    int j = a[0, 0];
+    tensor<int, 1, 7> k = a[1, :];
 }
 
 void loops(){ // testing labelled loops
@@ -54,6 +55,9 @@ void loops(){ // testing labelled loops
             }
             else if (i>100){
                 i=i+3;
+            }
+            else if (i<-2){
+                continue loop_label1;
             }
             i=i+1;
         }
