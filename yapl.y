@@ -2,6 +2,7 @@
 %{
 #include<stdio.h>
 extern char *yytext;
+extern int yylineno;
 int global_declarations=0;
 int func_definitions=0;
 int int_consts=0;
@@ -658,9 +659,9 @@ void yyerror(const char *s)
 	fflush(stdout);
 	
 	if(mode==-1)
-		printf("***parsing terminated*** [syntax error]\n");
+		fprintf(stderr, "***parsing terminated*** [syntax error]\n error at line %d near '%s'\n", yylineno, yytext);
 	else if(mode==0 || mode==1)
-		printf("%s\n",s);
+		fprintf(stderr, "%s\n syntax error at line %d near '%s'",s, yylineno, yytext);
 		
 	exit(-1);
 }
