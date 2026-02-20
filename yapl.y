@@ -113,7 +113,7 @@ slice_item
 
 slice_expression
 	: slice_item { $$ = $1; }
-	| slice_expression ',' slice_item { $$ = ($1 || $3); }
+	| slice_expression ',' slice_item { $$ = 1; }
 	;
 
 postfix_expression
