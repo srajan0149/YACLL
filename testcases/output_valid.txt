@@ -6,7 +6,7 @@
 #string_literals = 2
 #pointers_declarations = 3
 #tensor_definitions = 10
-#slice_expressions = 1
+#slice_expressions = 2
 #tensor_elementwise_ops = 4
 #tensor_contractions = 1
 #tensor_products = 1
