@@ -27,7 +27,7 @@ The folder testcases has many test files along with the output of the lexer when
 
 The following code displays how to run the lexer on `test_valid.c`, another test file name can be swapped for `test_valid.c` to test another file.
 ```Shell
-./yapl lex_test.c
+./yapl test_valid.c
 ```
 
 ## Important Files
