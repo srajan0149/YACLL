@@ -153,7 +153,11 @@ WS  [ \t\v\n\f]
 
 {WS}+                                   { }
 
-.                                       { }
+.                                       {
+                                          sprintf(buff,"***lexing terminated*** [lexer error]: ill-formed comment"); ////////////////
+                                          mode = 0;
+                                          yyerror(buff); ////////////////
+                                        }
 
 %%
 
