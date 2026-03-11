@@ -657,7 +657,7 @@ int mode=-1;
 void yyerror(const char *s)
 {
 	fflush(stdout);
-	
+	/*mode -1 for syntax error, mode 0 for lex error, mode 1 for user cli error, changes need to be made, mode -1 currently correct*/
 	if(mode==-1)
 		fprintf(stderr, "***parsing terminated*** [syntax error]\n error at line %d near '%s'\n", yylineno, yytext);
 	else if(mode==0 || mode==1)
