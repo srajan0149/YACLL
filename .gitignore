@@ -2,3 +2,10 @@ lex.yy.c
 y.tab.h
 y.tab.c
 yapl
+y.output
+parser_debug.o
+lalr_table.o
+parser_diag.o
+parsing_table.csv
+derivation.dot
+derivation.png

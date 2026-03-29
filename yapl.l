@@ -12,7 +12,6 @@ extern int sym_type(const char *);  /* returns type from symbol table */
 
 #define sym_type(identifier) IDENTIFIER /* with no symbol table, fake it */
 
-static void comment(void);
 static int check_type(void);
 %}
 
@@ -31,12 +30,22 @@ IS  (((u|U)(l|L|ll|LL)?)|((l|L|ll|LL)(u|U)?))
 CP  (u|U|L)
 SP  (u8|u|U|L)
 ES  (\\(['"\?\\abfnrtv]|[0-7]{1,3}|x[a-fA-F0-9]+))
-WS  [ \t\v\n\f]
+WS  [ \t\v\r\n\f]
+
+%x COMMENT
 
 %option yylineno
 
 %%
-"/*"                                    { comment(); }
+"/*"                                    { BEGIN(COMMENT); }
+<COMMENT>"*/"                           { BEGIN(INITIAL); }
+<COMMENT>\n                             { }
+<COMMENT>.                              { }
+<COMMENT><<EOF>>                        {
+                                                                                    sprintf(buff,"***lexing terminated*** [lexer error]: ill-formed comment");
+                                                                                    mode = 0;
+                                                                                    yyerror(buff);
+                                                                                }
 "//".*                                  { }
 
 "break"                                 { return(BREAK); }
@@ -154,9 +163,9 @@ WS  [ \t\v\n\f]
 {WS}+                                   { }
 
 .                                       {
-                                          sprintf(buff,"***lexing terminated*** [lexer error]: ill-formed comment"); ////////////////
+                                                                                    sprintf(buff,"***lexing terminated*** [lexer error]: invalid token");
                                           mode = 0;
-                                          yyerror(buff); ////////////////
+                                                                                    yyerror(buff);
                                         }
 
 %%
@@ -164,28 +173,6 @@ WS  [ \t\v\n\f]
 int yywrap(void)
 {
     return 1;
-}
-
-static void comment(void)
-{
-    int c;
-
-    while ((c = input()) != 0)
-        if (c == '*')
-        {
-            while ((c = input()) == '*')
-                ;
-
-            if (c == '/')
-                return;
-
-            if (c == 0)
-                break;
-        }
-
-    sprintf(buff,"***lexing terminated*** [lexer error]: ill-formed comment");
-    mode = 0;
-    yyerror(buff);
 }
 
 static int check_type(void)
