@@ -1,10 +1,13 @@
 
 %{
-#include<stdio.h>
-#include<stdlib.h>
-#include<ctype.h>
-#include<stdarg.h>
-#include<string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+#include <stdarg.h>
+#include <string.h>
+#include <time.h>          /* For clock() timing */
+#include <sys/time.h>     /* For gettimeofday() high-precision timing */
+#include <sys/resource.h>  /* For getrusage() memory measurement */
 
 /* Parser instrumentation modules */
 #include "parser_debug.h"
@@ -33,6 +36,11 @@ int labeled_continues=0;
 int ifs_wo_else=0;
 int ladder_len=0,hold=0;
 int max=-1;
+
+/* Benchmarking globals */
+struct timeval start_tv, end_tv;
+struct rusage rusage_after;
+long token_count = 0;
 
 /* Parser debug configuration */
 #define YYDEBUG 1
@@ -463,7 +471,6 @@ parameter_type_list
 parameter_list
 	: parameter_declaration
 	| parameter_list ',' parameter_declaration
-	| parameter_list ',' ELLIPSIS
 	;
 
 parameter_declaration
@@ -579,33 +586,31 @@ expression_statement
 	;
 
 selection_statement
-    : IF '(' expression ')' statement ELSE
-      {
+    : IF '(' expression ')' compound_statement ELSE compound_statement
+	  {
           ladder_len++;
-      }
-      statement
-      {
-          if (ladder_len >= max) {
-              max = ladder_len;
+		  if (ladder_len >= max) {
+        	  max = ladder_len;
           }
-          ladder_len--;
+		  ladder_len--;
       }
-    | IF '(' expression ')' statement
+    | IF '(' expression ')' compound_statement
       {
           ifs_wo_else++;
       }
-    | SWITCH '(' expression ')' statement
+    | SWITCH '(' expression ')' compound_statement
     ;
 
 loop_statement
-	: WHILE '(' expression ')' statement
-	| DO statement WHILE '(' expression ')' ';'
-	| FOR '(' expression_statement expression_statement ')' statement
-	| FOR '(' expression_statement expression_statement expression ')' statement
-	| FOR '(' declaration expression_statement ')' statement
-	| FOR '(' declaration expression_statement expression ')' statement
+	: WHILE '(' expression ')' compound_statement
+	| DO compound_statement WHILE '(' expression ')' ';'
+	| FOR '(' expression_statement expression_statement ')' compound_statement
+	| FOR '(' expression_statement expression_statement expression ')' compound_statement
+	| FOR '(' declaration expression_statement ')' compound_statement
+	| FOR '(' declaration expression_statement expression ')' compound_statement
 	| FOR IDENTIFIER IN IDENTIFIER axis_clause compound_statement {tensor_loops++;}
 	;
+
 iteration_statement
     : loop_statement
     | loop_label loop_statement
@@ -687,6 +692,10 @@ int main(int argc, char **argv)
 	extern int yydebug;
 #endif
 
+    /* Benchmarking variables */
+    double throughput = 0.0;
+    double parse_time = 0.0;
+
 	if(argc<2)
 	{
 		sprintf(buff,"***process terminated*** [input error]: invalid number of command-line arguments");
@@ -710,11 +719,32 @@ int main(int argc, char **argv)
 		parser_debug_init();
 		parser_diag_init();
 
+		/* Benchmarking: Lex to count tokens and measure throughput */
+		rewind(yyin);
+		gettimeofday(&start_tv, NULL);
+		int tok;
+		while ((tok = yylex()) != 0) {
+			token_count++;
+		}
+		gettimeofday(&end_tv, NULL);
+		double lex_time = (end_tv.tv_sec - start_tv.tv_sec) + (end_tv.tv_usec - start_tv.tv_usec) / 1000000.0;
+		throughput = (lex_time > 0) ? token_count / lex_time : 0.0;
+
+		/* Rewind for yyparse() to re-lex */
+		rewind(yyin);
+
 	#if YYDEBUG
 		yydebug = 1;
 	#endif
 
+		/* Benchmarking: Time parser speed */
+		gettimeofday(&start_tv, NULL);
 		yyparse();
+		gettimeofday(&end_tv, NULL);
+		parse_time = (end_tv.tv_sec - start_tv.tv_sec) + (end_tv.tv_usec - start_tv.tv_usec) / 1000000.0;
+
+		/* Benchmarking: Measure memory after parsing */
+		getrusage(RUSAGE_SELF, &rusage_after);
 	}
 
 	/* Export report artifacts to files */
@@ -740,6 +770,11 @@ int main(int argc, char **argv)
 	printf("#labeled_continues = %d\n",labeled_continues);
 	printf("#ifs_without_else = %d\n",ifs_wo_else);
 	printf("if-else max-depth = %d\n",((max<0)?0:max));
+
+	/* Benchmarking output */
+	printf("Lexer throughput: %.2f tokens/second\n", throughput);
+	printf("Parser speed: %.6f seconds\n", parse_time);
+	printf("Memory usage during parsing: %ld bytes\n", rusage_after.ru_maxrss * 1024);
 
 	return(0);
 }

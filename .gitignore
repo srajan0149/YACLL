@@ -7,6 +7,3 @@ yapl.output
 parser_debug.o
 lalr_table.o
 parser_diag.o
-parsing_table.csv
-derivation.dot
-derivation.png
