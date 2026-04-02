@@ -70,8 +70,20 @@
 #line 2 "yapl.y"
 
 #include<stdio.h>
+#include<stdlib.h>
+#include<ctype.h>
+#include<stdarg.h>
+#include<string.h>
+
+/* Parser instrumentation modules */
+#include "parser_debug.h"
+#include "lalr_table.h"
+#include "parser_diag.h"
+
 extern char *yytext;
 extern int yylineno;
+
+/* Global counters for semantic analysis */
 int global_declarations=0;
 int func_definitions=0;
 int int_consts=0;
@@ -90,11 +102,18 @@ int labeled_continues=0;
 int ifs_wo_else=0;
 int ladder_len=0,hold=0;
 int max=-1;
-/* avoid implicit declarations in generated y.tab.c */
+
+/* Parser debug configuration */
+#define YYDEBUG 1
+#define YYERROR_VERBOSE 1
+extern int parser_trace_printf(FILE *stream, const char *fmt, ...);
+#define YYFPRINTF(Stream, ...) parser_trace_printf((Stream), __VA_ARGS__)
+
+/* Avoid implicit declarations in generated y.tab.c */
 int yylex(void);
 void yyerror(const char *);
 
-#line 98 "yapl.tab.c"
+#line 117 "yapl.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -229,7 +248,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 62 "yapl.y"
+#line 81 "yapl.y"
 
 	int val;
 	int ival;
@@ -237,7 +256,7 @@ union YYSTYPE
     char *sval;
 	struct symtab *symp;
 
-#line 241 "yapl.tab.c"
+#line 260 "yapl.tab.c"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -792,7 +811,7 @@ union yyalloc
 /* YYNNTS -- Number of nonterminals.  */
 #define YYNNTS  89
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  306
+#define YYNRULES  305
 /* YYNSTATES -- Number of states.  */
 #define YYNSTATES  534
 
@@ -852,37 +871,37 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,    73,    73,    74,    75,    76,    77,    81,    82,    83,
-      87,    91,    92,    96,   100,   101,   105,   106,   110,   111,
-     115,   116,   120,   121,   122,   123,   124,   125,   126,   127,
-     128,   129,   133,   134,   138,   139,   140,   141,   142,   143,
-     144,   148,   149,   150,   151,   152,   153,   157,   158,   162,
-     163,   164,   165,   166,   167,   168,   169,   173,   174,   175,
-     176,   177,   181,   182,   183,   187,   188,   189,   190,   191,
-     192,   196,   197,   198,   202,   203,   207,   208,   212,   213,
-     217,   218,   222,   223,   227,   231,   232,   236,   237,   238,
-     239,   240,   241,   242,   243,   244,   245,   246,   250,   251,
-     255,   259,   260,   261,   265,   266,   267,   268,   269,   270,
-     271,   272,   273,   274,   278,   279,   283,   284,   288,   289,
-     290,   291,   292,   293,   297,   298,   299,   300,   301,   302,
-     303,   304,   305,   306,   307,   308,   309,   310,   311,   312,
-     313,   314,   318,   322,   326,   330,   331,   332,   336,   337,
-     341,   342,   346,   347,   348,   352,   353,   354,   355,   359,
-     360,   364,   365,   366,   367,   371,   372,   373,   374,   375,
-     379,   380,   384,   385,   389,   393,   394,   395,   396,   400,
-     401,   405,   406,   410,   410,   411,   415,   416,   417,   418,
-     419,   420,   421,   422,   423,   424,   425,   426,   427,   428,
-     432,   433,   434,   435,   439,   440,   445,   446,   450,   451,
-     452,   456,   457,   458,   462,   463,   467,   468,   472,   473,
-     474,   478,   479,   480,   481,   482,   483,   484,   485,   486,
-     487,   488,   489,   490,   491,   492,   493,   494,   495,   496,
-     497,   498,   502,   503,   504,   508,   509,   510,   511,   515,
-     519,   520,   524,   525,   529,   533,   534,   535,   536,   537,
-     538,   542,   543,   544,   548,   549,   553,   554,   558,   559,
-     563,   564,   569,   568,   579,   583,   587,   588,   589,   590,
-     591,   592,   593,   596,   597,   601,   602,   606,   607,   612,
-     613,   617,   618,   619,   620,   621,   622,   623,   627,   628,
-     629,   633,   634,   638,   639,   643,   644
+       0,    92,    92,    93,    94,    95,    96,   100,   101,   102,
+     106,   110,   111,   115,   119,   120,   124,   125,   129,   130,
+     134,   135,   139,   140,   141,   142,   143,   144,   145,   146,
+     147,   148,   152,   153,   157,   158,   159,   160,   161,   162,
+     163,   167,   168,   169,   170,   171,   172,   176,   177,   181,
+     182,   183,   184,   185,   186,   187,   188,   192,   193,   194,
+     195,   196,   200,   201,   202,   206,   207,   208,   209,   210,
+     211,   215,   216,   217,   221,   222,   226,   227,   231,   232,
+     236,   237,   241,   242,   246,   250,   251,   255,   256,   257,
+     258,   259,   260,   261,   262,   263,   264,   265,   269,   270,
+     274,   278,   279,   280,   284,   285,   286,   287,   288,   289,
+     290,   291,   292,   293,   297,   298,   302,   303,   307,   308,
+     309,   310,   311,   312,   316,   317,   318,   319,   320,   321,
+     322,   323,   324,   325,   326,   327,   328,   329,   330,   331,
+     332,   333,   337,   341,   345,   349,   350,   351,   355,   356,
+     360,   361,   365,   366,   367,   371,   372,   373,   374,   378,
+     379,   383,   384,   385,   386,   390,   391,   392,   393,   394,
+     398,   399,   403,   404,   408,   412,   413,   414,   415,   419,
+     420,   424,   425,   429,   429,   430,   434,   435,   436,   437,
+     438,   439,   440,   441,   442,   443,   444,   445,   446,   447,
+     451,   452,   453,   454,   458,   459,   464,   465,   469,   470,
+     471,   475,   476,   477,   481,   482,   486,   487,   491,   492,
+     493,   497,   498,   499,   500,   501,   502,   503,   504,   505,
+     506,   507,   508,   509,   510,   511,   512,   513,   514,   515,
+     516,   517,   521,   522,   523,   527,   528,   529,   530,   534,
+     538,   539,   543,   544,   548,   552,   553,   554,   555,   556,
+     557,   561,   562,   563,   567,   568,   572,   573,   577,   578,
+     582,   583,   588,   587,   598,   602,   606,   607,   608,   609,
+     610,   611,   612,   615,   616,   620,   621,   625,   626,   631,
+     632,   636,   637,   638,   639,   640,   641,   642,   646,   647,
+     651,   652,   656,   657,   661,   662
 };
 #endif
 
@@ -1027,20 +1046,20 @@ static const yytype_int16 yypact[] =
    means the default is an error.  */
 static const yytype_int16 yydefact[] =
 {
-     298,   141,   118,   119,   120,   122,   123,   179,   175,   176,
+       0,   141,   118,   119,   120,   122,   123,   179,   175,   176,
      177,   135,   125,   126,   127,   128,   131,   132,   129,   130,
      124,   136,   137,   148,   149,     0,     0,   178,   180,     0,
-     121,   133,     0,   302,     0,   105,   107,   134,   139,     0,
-     140,   138,   109,   111,   113,   103,     0,   299,   301,   169,
+     121,   133,     0,   301,     0,   105,   107,   134,   139,     0,
+     140,   138,   109,   111,   113,   103,     0,   298,   300,   169,
        0,     0,     0,     0,     0,   186,     0,   203,   101,     0,
      114,   117,   185,   183,   104,   106,   147,     0,   108,   110,
-     112,     1,   300,     0,    10,   173,     0,   170,     2,     7,
+     112,     1,   299,     0,    10,   173,     0,   170,     2,     7,
        8,    11,    12,     0,     0,     0,     9,     0,     0,     0,
       41,    42,    43,    44,    45,    46,    22,     3,     4,     6,
       34,    47,     0,    49,    57,    62,    65,    71,    74,    76,
       78,    80,    82,    84,   100,     0,   156,   217,   158,     0,
        0,     0,     0,     0,     0,     0,   178,   204,   202,   201,
-       0,   102,     0,     0,   305,     0,   304,     0,     0,     0,
+       0,   102,     0,     0,   304,     0,   303,     0,     0,     0,
        0,     0,     0,   150,     0,   154,     0,     0,     0,   165,
        0,    38,     0,    35,    36,     0,     0,    47,    85,    98,
        0,     0,     0,    28,    29,     0,     0,     0,    37,     0,
@@ -1051,7 +1070,7 @@ static const yytype_int16 yydefact[] =
      115,   117,     2,     0,     0,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,   264,   270,     0,   268,     0,
      269,   255,   256,     0,   266,   257,   258,   283,   259,   260,
-       0,   244,   116,   306,   303,   214,   198,   213,     0,   207,
+       0,   244,   116,   305,   302,   214,   198,   213,     0,   207,
      208,     0,     0,   188,    42,     0,     0,   184,     0,   145,
      151,     0,   152,     0,   159,   164,     0,   167,   172,   166,
      171,     0,     0,     0,     0,    88,    89,    90,    91,    92,
@@ -1735,7 +1754,7 @@ static const yytype_uint8 yyr1[] =
      188,   188,   190,   189,   189,   189,   191,   191,   191,   191,
      191,   191,   191,   192,   192,   193,   193,   194,   194,   195,
      195,   196,   196,   196,   196,   196,   196,   196,   197,   197,
-     197,   198,   198,   199,   199,   200,   200
+     198,   198,   199,   199,   200,   200
 };
 
 /* YYR2[RULE-NUM] -- Number of symbols on the right-hand side of rule RULE-NUM.  */
@@ -1770,8 +1789,8 @@ static const yytype_int8 yyr2[] =
        1,     3,     4,     3,     2,     3,     1,     2,     1,     1,
        1,     2,     0,     8,     5,     5,     5,     7,     6,     7,
        6,     7,     6,     1,     2,     0,     4,     1,     3,     1,
-       3,     3,     2,     3,     2,     3,     2,     3,     0,     1,
-       2,     1,     1,     4,     3,     1,     2
+       3,     3,     2,     3,     2,     3,     2,     3,     1,     2,
+       1,     1,     4,     3,     1,     2
 };
 
 
@@ -2235,172 +2254,172 @@ yyreduce:
   switch (yyn)
     {
   case 7: /* constant: I_CONSTANT  */
-#line 81 "yapl.y"
+#line 100 "yapl.y"
                      {int_consts++;}
-#line 2241 "yapl.tab.c"
+#line 2260 "yapl.tab.c"
     break;
 
   case 8: /* constant: F_CONSTANT  */
-#line 82 "yapl.y"
+#line 101 "yapl.y"
                      {float_consts++;}
-#line 2247 "yapl.tab.c"
+#line 2266 "yapl.tab.c"
     break;
 
   case 11: /* string: STRING_LITERAL  */
-#line 91 "yapl.y"
+#line 110 "yapl.y"
                          {string_literals++;}
-#line 2253 "yapl.tab.c"
+#line 2272 "yapl.tab.c"
     break;
 
   case 18: /* slice_item: assignment_expression  */
-#line 110 "yapl.y"
+#line 129 "yapl.y"
                                 { (yyval.ival) = 0; }
-#line 2259 "yapl.tab.c"
+#line 2278 "yapl.tab.c"
     break;
 
   case 19: /* slice_item: ':'  */
-#line 111 "yapl.y"
+#line 130 "yapl.y"
               { (yyval.ival) = 1; }
-#line 2265 "yapl.tab.c"
+#line 2284 "yapl.tab.c"
     break;
 
   case 20: /* slice_expression: slice_item  */
-#line 115 "yapl.y"
+#line 134 "yapl.y"
                      { (yyval.ival) = (yyvsp[0].ival); }
-#line 2271 "yapl.tab.c"
+#line 2290 "yapl.tab.c"
     break;
 
   case 21: /* slice_expression: slice_expression ',' slice_item  */
-#line 116 "yapl.y"
+#line 135 "yapl.y"
                                           { (yyval.ival) = 1; }
-#line 2277 "yapl.tab.c"
+#line 2296 "yapl.tab.c"
     break;
 
   case 23: /* postfix_expression: postfix_expression '[' slice_expression ']'  */
-#line 121 "yapl.y"
+#line 140 "yapl.y"
                                                       { if ((yyvsp[-1].ival)) slice_expressions_count++; }
-#line 2283 "yapl.tab.c"
+#line 2302 "yapl.tab.c"
     break;
 
   case 53: /* multiplicative_expression: multiplicative_expression DOT_MUL cast_expression  */
-#line 166 "yapl.y"
+#line 185 "yapl.y"
                                                             {tensor_elementwise_ops++;}
-#line 2289 "yapl.tab.c"
+#line 2308 "yapl.tab.c"
     break;
 
   case 54: /* multiplicative_expression: multiplicative_expression DOT_DIV cast_expression  */
-#line 167 "yapl.y"
+#line 186 "yapl.y"
                                                             {tensor_elementwise_ops++;}
-#line 2295 "yapl.tab.c"
+#line 2314 "yapl.tab.c"
     break;
 
   case 55: /* multiplicative_expression: multiplicative_expression AT cast_expression  */
-#line 168 "yapl.y"
+#line 187 "yapl.y"
                                                        {tensor_contractions++;}
-#line 2301 "yapl.tab.c"
+#line 2320 "yapl.tab.c"
     break;
 
   case 56: /* multiplicative_expression: multiplicative_expression AT_MUL cast_expression  */
-#line 169 "yapl.y"
+#line 188 "yapl.y"
                                                            {tensor_products++;}
-#line 2307 "yapl.tab.c"
+#line 2326 "yapl.tab.c"
     break;
 
   case 60: /* additive_expression: additive_expression DOT_ADD multiplicative_expression  */
-#line 176 "yapl.y"
+#line 195 "yapl.y"
                                                                 {tensor_elementwise_ops++;}
-#line 2313 "yapl.tab.c"
+#line 2332 "yapl.tab.c"
     break;
 
   case 61: /* additive_expression: additive_expression DOT_SUB multiplicative_expression  */
-#line 177 "yapl.y"
+#line 196 "yapl.y"
                                                                 {tensor_elementwise_ops++;}
-#line 2319 "yapl.tab.c"
+#line 2338 "yapl.tab.c"
     break;
 
   case 142: /* tensor_type: TENSOR '<' tensor_params '>'  */
-#line 318 "yapl.y"
+#line 337 "yapl.y"
                                        {tensor_definitions++;}
-#line 2325 "yapl.tab.c"
+#line 2344 "yapl.tab.c"
     break;
 
   case 144: /* loop_label: BACKTICK IDENTIFIER ':'  */
-#line 326 "yapl.y"
+#line 345 "yapl.y"
                                    {loop_labels_count++;}
-#line 2331 "yapl.tab.c"
+#line 2350 "yapl.tab.c"
     break;
 
   case 183: /* $@1: %empty  */
-#line 410 "yapl.y"
+#line 429 "yapl.y"
                   {pointer_decls++;}
-#line 2337 "yapl.tab.c"
+#line 2356 "yapl.tab.c"
     break;
 
   case 272: /* $@2: %empty  */
-#line 569 "yapl.y"
+#line 588 "yapl.y"
       {
           ladder_len++;
       }
-#line 2345 "yapl.tab.c"
+#line 2364 "yapl.tab.c"
     break;
 
   case 273: /* selection_statement: IF '(' expression ')' statement ELSE $@2 statement  */
-#line 573 "yapl.y"
+#line 592 "yapl.y"
       {
           if (ladder_len >= max) {
               max = ladder_len;
           }
           ladder_len--;
       }
-#line 2356 "yapl.tab.c"
+#line 2375 "yapl.tab.c"
     break;
 
   case 274: /* selection_statement: IF '(' expression ')' statement  */
-#line 580 "yapl.y"
+#line 599 "yapl.y"
       {
           ifs_wo_else++;
       }
-#line 2364 "yapl.tab.c"
+#line 2383 "yapl.tab.c"
     break;
 
   case 282: /* loop_statement: FOR IDENTIFIER IN IDENTIFIER axis_clause compound_statement  */
-#line 593 "yapl.y"
+#line 612 "yapl.y"
                                                                       {tensor_loops++;}
-#line 2370 "yapl.tab.c"
+#line 2389 "yapl.tab.c"
     break;
 
   case 293: /* jump_statement: CONTINUE IDENTIFIER ';'  */
-#line 619 "yapl.y"
+#line 638 "yapl.y"
                                   {labeled_continues++;}
-#line 2376 "yapl.tab.c"
+#line 2395 "yapl.tab.c"
     break;
 
   case 295: /* jump_statement: BREAK IDENTIFIER ';'  */
-#line 621 "yapl.y"
+#line 640 "yapl.y"
                                {labeled_breaks++;}
-#line 2382 "yapl.tab.c"
+#line 2401 "yapl.tab.c"
     break;
 
-  case 299: /* translation_unit: external_declaration  */
-#line 628 "yapl.y"
+  case 298: /* translation_unit: external_declaration  */
+#line 646 "yapl.y"
                                {global_declarations++;}
-#line 2388 "yapl.tab.c"
+#line 2407 "yapl.tab.c"
     break;
 
-  case 300: /* translation_unit: translation_unit external_declaration  */
-#line 629 "yapl.y"
+  case 299: /* translation_unit: translation_unit external_declaration  */
+#line 647 "yapl.y"
                                                 {global_declarations++;}
-#line 2394 "yapl.tab.c"
+#line 2413 "yapl.tab.c"
     break;
 
-  case 301: /* external_declaration: function_definition  */
-#line 633 "yapl.y"
+  case 300: /* external_declaration: function_definition  */
+#line 651 "yapl.y"
                               {func_definitions++;}
-#line 2400 "yapl.tab.c"
+#line 2419 "yapl.tab.c"
     break;
 
 
-#line 2404 "yapl.tab.c"
+#line 2423 "yapl.tab.c"
 
       default: break;
     }
@@ -2593,7 +2612,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 647 "yapl.y"
+#line 665 "yapl.y"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -2606,10 +2625,11 @@ int mode=-1;
 
 void yyerror(const char *s)
 {
-	fflush(stdout);
-	/*mode -1 for syntax error, mode 0 for lex error, mode 1 for user cli error, changes need to be made, mode -1 currently correct*/
+	/*mode -1 for syntax error, mode 0 for lex error, mode 1 for user cli error*/
 	if(mode==-1)
-		fprintf(stderr, "***parsing terminated*** [syntax error]\n error at line %d near '%s'\n", yylineno, yytext);
+	{
+		parser_diag_error(s);
+	}
 	else if(mode==0 || mode==1)
 		fprintf(stderr, "%s\n syntax error at line %d near '%s'",s, yylineno, yytext);
 		
@@ -2619,6 +2639,9 @@ void yyerror(const char *s)
 int main(int argc, char **argv)
 {
     extern FILE *yyin;
+#if YYDEBUG
+	extern int yydebug;
+#endif
 
 	if(argc<2)
 	{
@@ -2639,12 +2662,21 @@ int main(int argc, char **argv)
 	}
 	else
 	{
-		do
-		{
-			yyparse();
-		}
-		while(!feof(yyin));
+		/* Initialize parser instrumentation modules */
+		parser_debug_init();
+		parser_diag_init();
+
+	#if YYDEBUG
+		yydebug = 1;
+	#endif
+
+		yyparse();
 	}
+
+	/* Export report artifacts to files */
+	lalr_table_export_csv("y.output", "parsing_table.csv");
+	parser_debug_export_derivation("derivation.dot", "derivation.png");
+	printf("artifacts: parsing_table.csv, derivation.dot (and derivation.png if dot is installed)\n");
 
 	printf("***parsing successful***\n");
 	printf("#global_declarations = %d\n",global_declarations);

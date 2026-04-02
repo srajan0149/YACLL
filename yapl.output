@@ -3,7 +3,6 @@ Terminals unused in grammar
     ITEM
 
 
-State 0 conflicts: 32 shift/reduce
 State 27 conflicts: 1 shift/reduce
 State 368 conflicts: 1 shift/reduce
 State 441 conflicts: 1 reduce/reduce
@@ -394,18 +393,17 @@ Grammar
   295               | RETURN ';'
   296               | RETURN expression ';'
 
-  297 translation_unit: ε
-  298                 | external_declaration
-  299                 | translation_unit external_declaration
+  297 translation_unit: external_declaration
+  298                 | translation_unit external_declaration
 
-  300 external_declaration: function_definition
-  301                     | declaration
+  299 external_declaration: function_definition
+  300                     | declaration
 
-  302 function_definition: declaration_specifiers declarator declaration_list compound_statement
-  303                    | declaration_specifiers declarator compound_statement
+  301 function_definition: declaration_specifiers declarator declaration_list compound_statement
+  302                    | declaration_specifiers declarator compound_statement
 
-  304 declaration_list: declaration
-  305                 | declaration_list declaration
+  303 declaration_list: declaration
+  304                 | declaration_list declaration
 
 
 Terminals, with rules where they appear
@@ -616,10 +614,10 @@ Nonterminals, with rules where they appear
         on right: 160 161 171 181 251 253 261
     declaration (142)
         on left: 100 101 102
-        on right: 267 279 280 301 304 305
+        on right: 267 279 280 300 303 304
     declaration_specifiers (143)
         on left: 103 104 105 106 107 108 109 110 111 112
-        on right: 100 101 103 105 107 109 111 210 211 212 302 303
+        on right: 100 101 103 105 107 109 111 210 211 212 301 302
     init_declarator_list (144)
         on left: 113 114
         on right: 101 114
@@ -685,7 +683,7 @@ Nonterminals, with rules where they appear
         on right: 111 112
     declarator (165)
         on left: 183 184
-        on right: 115 116 161 162 163 186 210 302 303
+        on right: 115 116 161 162 163 186 210 301 302
     $@1 (166)
         on left: 182
         on right: 183
@@ -745,7 +743,7 @@ Nonterminals, with rules where they appear
         on right: 254
     compound_statement (185)
         on left: 263 264
-        on right: 255 281 302 303
+        on right: 255 281 301 302
     block_item_list (186)
         on left: 265 266
         on right: 264 266
@@ -780,17 +778,17 @@ Nonterminals, with rules where they appear
         on left: 290 291 292 293 294 295 296
         on right: 259
     translation_unit (197)
-        on left: 297 298 299
-        on right: 0 299
+        on left: 297 298
+        on right: 0 298
     external_declaration (198)
-        on left: 300 301
-        on right: 298 299
+        on left: 299 300
+        on right: 297 298
     function_definition (199)
-        on left: 302 303
-        on right: 300
+        on left: 301 302
+        on right: 299
     declaration_list (200)
-        on left: 304 305
-        on right: 302 305
+        on left: 303 304
+        on right: 301 304
 
 
 State 0
@@ -829,40 +827,6 @@ State 0
     THREAD_LOCAL   shift, and go to state 30
     TEXT           shift, and go to state 31
     TENSOR         shift, and go to state 32
-
-    TYPEDEF_NAME   [reduce using rule 297 (translation_unit)]
-    TYPEDEF        [reduce using rule 297 (translation_unit)]
-    EXTERN         [reduce using rule 297 (translation_unit)]
-    STATIC         [reduce using rule 297 (translation_unit)]
-    AUTO           [reduce using rule 297 (translation_unit)]
-    REGISTER       [reduce using rule 297 (translation_unit)]
-    INLINE         [reduce using rule 297 (translation_unit)]
-    CONST          [reduce using rule 297 (translation_unit)]
-    RESTRICT       [reduce using rule 297 (translation_unit)]
-    VOLATILE       [reduce using rule 297 (translation_unit)]
-    BOOL           [reduce using rule 297 (translation_unit)]
-    CHAR           [reduce using rule 297 (translation_unit)]
-    SHORT          [reduce using rule 297 (translation_unit)]
-    INT            [reduce using rule 297 (translation_unit)]
-    LONG           [reduce using rule 297 (translation_unit)]
-    SIGNED         [reduce using rule 297 (translation_unit)]
-    UNSIGNED       [reduce using rule 297 (translation_unit)]
-    FP             [reduce using rule 297 (translation_unit)]
-    DOUBLE         [reduce using rule 297 (translation_unit)]
-    VOID           [reduce using rule 297 (translation_unit)]
-    COMPLEX        [reduce using rule 297 (translation_unit)]
-    IMAGINARY      [reduce using rule 297 (translation_unit)]
-    STRUCT         [reduce using rule 297 (translation_unit)]
-    UNION          [reduce using rule 297 (translation_unit)]
-    ENUM           [reduce using rule 297 (translation_unit)]
-    ALIGNAS        [reduce using rule 297 (translation_unit)]
-    ATOMIC         [reduce using rule 297 (translation_unit)]
-    NORETURN       [reduce using rule 297 (translation_unit)]
-    STATIC_ASSERT  [reduce using rule 297 (translation_unit)]
-    THREAD_LOCAL   [reduce using rule 297 (translation_unit)]
-    TEXT           [reduce using rule 297 (translation_unit)]
-    TENSOR         [reduce using rule 297 (translation_unit)]
-    $default       reduce using rule 297 (translation_unit)
 
     declaration                go to state 33
     declaration_specifiers     go to state 34
@@ -1118,17 +1082,17 @@ State 32
 
 State 33
 
-  301 external_declaration: declaration •
+  300 external_declaration: declaration •
 
-    $default  reduce using rule 301 (external_declaration)
+    $default  reduce using rule 300 (external_declaration)
 
 
 State 34
 
   100 declaration: declaration_specifiers • ';'
   101            | declaration_specifiers • init_declarator_list ';'
-  302 function_definition: declaration_specifiers • declarator declaration_list compound_statement
-  303                    | declaration_specifiers • declarator compound_statement
+  301 function_definition: declaration_specifiers • declarator declaration_list compound_statement
+  302                    | declaration_specifiers • declarator compound_statement
 
     IDENTIFIER  shift, and go to state 55
     '('         shift, and go to state 56
@@ -1450,7 +1414,7 @@ State 45
 State 46
 
     0 $accept: translation_unit • $end
-  299 translation_unit: translation_unit • external_declaration
+  298 translation_unit: translation_unit • external_declaration
 
     $end           shift, and go to state 71
     TYPEDEF_NAME   shift, and go to state 1
@@ -1505,16 +1469,16 @@ State 46
 
 State 47
 
-  298 translation_unit: external_declaration •
+  297 translation_unit: external_declaration •
 
-    $default  reduce using rule 298 (translation_unit)
+    $default  reduce using rule 297 (translation_unit)
 
 
 State 48
 
-  300 external_declaration: function_definition •
+  299 external_declaration: function_definition •
 
-    $default  reduce using rule 300 (external_declaration)
+    $default  reduce using rule 299 (external_declaration)
 
 
 State 49
@@ -1800,8 +1764,8 @@ State 61
 
   115 init_declarator: declarator • '=' initializer
   116                | declarator •
-  302 function_definition: declaration_specifiers declarator • declaration_list compound_statement
-  303                    | declaration_specifiers declarator • compound_statement
+  301 function_definition: declaration_specifiers declarator • declaration_list compound_statement
+  302                    | declaration_specifiers declarator • compound_statement
 
     TYPEDEF_NAME   shift, and go to state 1
     TYPEDEF        shift, and go to state 2
@@ -1983,9 +1947,9 @@ State 71
 
 State 72
 
-  299 translation_unit: translation_unit external_declaration •
+  298 translation_unit: translation_unit external_declaration •
 
-    $default  reduce using rule 299 (translation_unit)
+    $default  reduce using rule 298 (translation_unit)
 
 
 State 73
@@ -2921,9 +2885,9 @@ State 133
 
 State 134
 
-  304 declaration_list: declaration •
+  303 declaration_list: declaration •
 
-    $default  reduce using rule 304 (declaration_list)
+    $default  reduce using rule 303 (declaration_list)
 
 
 State 135
@@ -2945,15 +2909,15 @@ State 135
 
 State 136
 
-  303 function_definition: declaration_specifiers declarator compound_statement •
+  302 function_definition: declaration_specifiers declarator compound_statement •
 
-    $default  reduce using rule 303 (function_definition)
+    $default  reduce using rule 302 (function_definition)
 
 
 State 137
 
-  302 function_definition: declaration_specifiers declarator declaration_list • compound_statement
-  305 declaration_list: declaration_list • declaration
+  301 function_definition: declaration_specifiers declarator declaration_list • compound_statement
+  304 declaration_list: declaration_list • declaration
 
     TYPEDEF_NAME   shift, and go to state 1
     TYPEDEF        shift, and go to state 2
@@ -5454,16 +5418,16 @@ State 242
 
 State 243
 
-  305 declaration_list: declaration_list declaration •
+  304 declaration_list: declaration_list declaration •
 
-    $default  reduce using rule 305 (declaration_list)
+    $default  reduce using rule 304 (declaration_list)
 
 
 State 244
 
-  302 function_definition: declaration_specifiers declarator declaration_list compound_statement •
+  301 function_definition: declaration_specifiers declarator declaration_list compound_statement •
 
-    $default  reduce using rule 302 (function_definition)
+    $default  reduce using rule 301 (function_definition)
 
 
 State 245

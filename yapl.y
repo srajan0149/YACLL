@@ -1,8 +1,20 @@
 
 %{
 #include<stdio.h>
+#include<stdlib.h>
+#include<ctype.h>
+#include<stdarg.h>
+#include<string.h>
+
+/* Parser instrumentation modules */
+#include "parser_debug.h"
+#include "lalr_table.h"
+#include "parser_diag.h"
+
 extern char *yytext;
 extern int yylineno;
+
+/* Global counters for semantic analysis */
 int global_declarations=0;
 int func_definitions=0;
 int int_consts=0;
@@ -21,7 +33,14 @@ int labeled_continues=0;
 int ifs_wo_else=0;
 int ladder_len=0,hold=0;
 int max=-1;
-/* avoid implicit declarations in generated y.tab.c */
+
+/* Parser debug configuration */
+#define YYDEBUG 1
+#define YYERROR_VERBOSE 1
+extern int parser_trace_printf(FILE *stream, const char *fmt, ...);
+#define YYFPRINTF(Stream, ...) parser_trace_printf((Stream), __VA_ARGS__)
+
+/* Avoid implicit declarations in generated y.tab.c */
 int yylex(void);
 void yyerror(const char *);
 %}
@@ -624,8 +643,7 @@ jump_statement
 	;
 
 translation_unit
-	: /* empty */
-	| external_declaration {global_declarations++;}
+	: external_declaration {global_declarations++;}
 	| translation_unit external_declaration {global_declarations++;}
 	;
 
@@ -656,10 +674,11 @@ int mode=-1;
 
 void yyerror(const char *s)
 {
-	fflush(stdout);
-	/*mode -1 for syntax error, mode 0 for lex error, mode 1 for user cli error, changes need to be made, mode -1 currently correct*/
+	/*mode -1 for syntax error, mode 0 for lex error, mode 1 for user cli error*/
 	if(mode==-1)
-		fprintf(stderr, "***parsing terminated*** [syntax error]\n error at line %d near '%s'\n", yylineno, yytext);
+	{
+		parser_diag_error(s);
+	}
 	else if(mode==0 || mode==1)
 		fprintf(stderr, "%s\n syntax error at line %d near '%s'",s, yylineno, yytext);
 		
@@ -669,6 +688,9 @@ void yyerror(const char *s)
 int main(int argc, char **argv)
 {
     extern FILE *yyin;
+#if YYDEBUG
+	extern int yydebug;
+#endif
 
 	if(argc<2)
 	{
@@ -689,12 +711,21 @@ int main(int argc, char **argv)
 	}
 	else
 	{
-		do
-		{
-			yyparse();
-		}
-		while(!feof(yyin));
+		/* Initialize parser instrumentation modules */
+		parser_debug_init();
+		parser_diag_init();
+
+	#if YYDEBUG
+		yydebug = 1;
+	#endif
+
+		yyparse();
 	}
+
+	/* Export report artifacts to files */
+	lalr_table_export_csv("y.output", "parsing_table.csv");
+	parser_debug_export_derivation("derivation.dot", "derivation.png");
+	printf("artifacts: parsing_table.csv, derivation.dot (and derivation.png if dot is installed)\n");
 
 	printf("***parsing successful***\n");
 	printf("#global_declarations = %d\n",global_declarations);
