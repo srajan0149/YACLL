@@ -421,7 +421,7 @@ alignment_specifier
 	;
 
 declarator
-	: pointer {pointer_decls++;} direct_declarator
+	: pointer direct_declarator
 	| direct_declarator
 	;
 
