@@ -584,33 +584,31 @@ expression_statement
 	;
 
 selection_statement
-    : IF '(' expression ')' statement ELSE
-      {
+    : IF '(' expression ')' compound_statement ELSE compound_statement
+	  {
           ladder_len++;
-      }
-      statement
-      {
-          if (ladder_len >= max) {
-              max = ladder_len;
+		  if (ladder_len >= max) {
+        	  max = ladder_len;
           }
-          ladder_len--;
+		  ladder_len--;
       }
-    | IF '(' expression ')' statement
+    | IF '(' expression ')' compound_statement
       {
           ifs_wo_else++;
       }
-    | SWITCH '(' expression ')' statement
+    | SWITCH '(' expression ')' compound_statement
     ;
 
 loop_statement
-	: WHILE '(' expression ')' statement
-	| DO statement WHILE '(' expression ')' ';'
-	| FOR '(' expression_statement expression_statement ')' statement
-	| FOR '(' expression_statement expression_statement expression ')' statement
-	| FOR '(' declaration expression_statement ')' statement
-	| FOR '(' declaration expression_statement expression ')' statement
+	: WHILE '(' expression ')' compound_statement
+	| DO compound_statement WHILE '(' expression ')' ';'
+	| FOR '(' expression_statement expression_statement ')' compound_statement
+	| FOR '(' expression_statement expression_statement expression ')' compound_statement
+	| FOR '(' declaration expression_statement ')' compound_statement
+	| FOR '(' declaration expression_statement expression ')' compound_statement
 	| FOR IDENTIFIER IN IDENTIFIER axis_clause compound_statement {tensor_loops++;}
 	;
+
 iteration_statement
     : loop_statement
     | loop_label loop_statement
