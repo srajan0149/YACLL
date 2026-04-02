@@ -586,14 +586,22 @@ expression_statement
 	;
 
 selection_statement
-    : IF '(' expression ')' compound_statement ELSE compound_statement
-	  {
+    : IF '(' expression ')' compound_statement ELSE selection_statement
+      {
           ladder_len++;
-		  if (ladder_len >= max) {
-        	  max = ladder_len;
+          if (ladder_len >= max) {
+              max = ladder_len;
           }
-		  ladder_len--;
+          ladder_len--;
       }
+    | IF '(' expression ')' compound_statement ELSE compound_statement
+      {
+          ladder_len++;
+          if (ladder_len >= max) {
+              max = ladder_len;
+          }
+          ladder_len--;
+	  }
     | IF '(' expression ')' compound_statement
       {
           ifs_wo_else++;
