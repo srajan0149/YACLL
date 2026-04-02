@@ -55,7 +55,7 @@ void yyerror(const char *);
 %token	TYPEDEF EXTERN STATIC AUTO REGISTER INLINE
 %token	CONST RESTRICT VOLATILE
 %token	BOOL CHAR SHORT INT LONG SIGNED UNSIGNED FP DOUBLE VOID
-%token	COMPLEX IMAGINARY 
+%token	COMPLEX IMAGINARY
 %token	STRUCT UNION ENUM ELLIPSIS
 
 %token	CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN
@@ -71,7 +71,7 @@ void yyerror(const char *);
 %left DOT_ADD DOT_SUB
 %left DOT_MUL DOT_DIV
 %left AT AT_MUL
-%token BACKTICK 
+%token BACKTICK
 
 %type <ival> slice_expression slice_item
 
@@ -327,7 +327,6 @@ type_specifier
 	| BOOL
 	| COMPLEX
 	| IMAGINARY	  	/* non-mandated extension */
-	| atomic_type_specifier
 	| struct_or_union_specifier
 	| enum_specifier
 	| TYPEDEF_NAME		/* after it has been defined as such */
@@ -404,10 +403,6 @@ enumerator	/* identifiers must be flagged as ENUMERATION_CONSTANT */
 	| enumeration_constant
 	;
 
-atomic_type_specifier
-	: ATOMIC '(' type_name ')'
-	;
-
 type_qualifier
 	: CONST
 	| RESTRICT
@@ -442,7 +437,7 @@ direct_declarator
 	| direct_declarator '[' type_qualifier_list assignment_expression ']'
 	| direct_declarator '[' type_qualifier_list ']'
 	| direct_declarator '[' assignment_expression ']'
-	| direct_declarator '(' parameter_type_list ')' 
+	| direct_declarator '(' parameter_type_list ')'
 	| direct_declarator '(' ')'
 	| direct_declarator '(' identifier_list ')'
 	;
@@ -681,7 +676,7 @@ void yyerror(const char *s)
 	}
 	else if(mode==0 || mode==1)
 		fprintf(stderr, "%s\n syntax error at line %d near '%s'",s, yylineno, yytext);
-		
+
 	exit(-1);
 }
 
