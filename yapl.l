@@ -76,7 +76,7 @@ WS  [ \t\v\r\n\f]
 "axis"                                  { return(AXIS); }
 "in"                                    { return(IN); }
 
-{L}{A}*                                 { return check_type(); }
+{L}{A}*                                 { yylval.sval = strdup(yytext); return check_type(); }
 
 {DU}                                    {
                                             char buf[256];

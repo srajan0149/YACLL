@@ -1,5 +1,5 @@
-yapl: y.tab.c lex.yy.c parser_debug.o lalr_table.o parser_diag.o
-	gcc -O3 lex.yy.c y.tab.c parser_debug.o lalr_table.o parser_diag.o -o yapl
+yapl: y.tab.c lex.yy.c parser_debug.o lalr_table.o parser_diag.o icg.o symtab.o
+	gcc -O3 lex.yy.c y.tab.c parser_debug.o lalr_table.o parser_diag.o icg.o symtab.o -o yapl
 	@echo "Run the program as ./yapl [input_file]"
 
 y.tab.c: yapl.y 
@@ -17,6 +17,12 @@ lalr_table.o: lalr_table.c lalr_table.h
 parser_diag.o: parser_diag.c parser_diag.h parser_debug.h lalr_table.h
 	gcc -c parser_diag.c -o parser_diag.o
 
+icg.o: icg.c icg.h
+	gcc -c icg.c -o icg.o
+
+symtab.o: symtab.c symtab.h icg.h
+	gcc -c symtab.c -o symtab.o
+
 clean:
-	@rm -f lex.yy.c y.tab.h y.tab.c y.output yapl parser_debug.o lalr_table.o parser_diag.o parsing_table.csv  derivation.dot derivation.png
+	@rm -f lex.yy.c y.tab.h y.tab.c y.output yapl parser_debug.o lalr_table.o parser_diag.o parsing_table.csv  derivation.dot derivation.png icg.o symtab.o
 

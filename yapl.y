@@ -13,12 +13,17 @@
 #include "parser_debug.h"
 #include "lalr_table.h"
 #include "parser_diag.h"
+#include "icg.h"
+#include "symtab.h"
 
 extern char *yytext;
 extern int yylineno;
 
 /* Global counters for semantic analysis */
 int global_declarations=0;
+static char *icg_cond       = NULL; /* if-condition passthrough */
+static int   loop_depth     = 0;    /* for break/continue validation */
+static IcgType current_decl_type = T_UNKNOWN; /* set by type_specifier */
 int func_definitions=0;
 int int_consts=0;
 int float_consts=0;
@@ -53,22 +58,24 @@ int yylex(void);
 void yyerror(const char *);
 %}
 
-%token	IDENTIFIER I_CONSTANT F_CONSTANT STRING_LITERAL FUNC_NAME SIZEOF
-%token	PTR_OP INC_OP DEC_OP LEFT_OP RIGHT_OP LE_OP GE_OP EQ_OP NE_OP TH_OP
-%token	AND_OP OR_OP MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN ADD_ASSIGN
-%token	SUB_ASSIGN LEFT_ASSIGN RIGHT_ASSIGN AND_ASSIGN
-%token	XOR_ASSIGN OR_ASSIGN
-%token	TYPEDEF_NAME ENUMERATION_CONSTANT
+%token <sval>	IDENTIFIER
+%token <val>	I_CONSTANT F_CONSTANT
+%token		STRING_LITERAL FUNC_NAME SIZEOF
+%token		PTR_OP INC_OP DEC_OP LEFT_OP RIGHT_OP LE_OP GE_OP EQ_OP NE_OP TH_OP
+%token		AND_OP OR_OP MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN ADD_ASSIGN
+%token		SUB_ASSIGN LEFT_ASSIGN RIGHT_ASSIGN AND_ASSIGN
+%token		XOR_ASSIGN OR_ASSIGN
+%token		TYPEDEF_NAME ENUMERATION_CONSTANT
 
-%token	TYPEDEF EXTERN STATIC AUTO REGISTER INLINE
-%token	CONST RESTRICT VOLATILE
-%token	BOOL CHAR SHORT INT LONG SIGNED UNSIGNED FP DOUBLE VOID
-%token	COMPLEX IMAGINARY
-%token	STRUCT UNION ENUM ELLIPSIS
+%token		TYPEDEF EXTERN STATIC AUTO REGISTER INLINE
+%token		CONST RESTRICT VOLATILE
+%token		BOOL CHAR SHORT INT LONG SIGNED UNSIGNED FP DOUBLE VOID
+%token		COMPLEX IMAGINARY
+%token		STRUCT UNION ENUM ELLIPSIS
 
-%token	CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN
+%token		CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN
 
-%token	ALIGNAS ALIGNOF ATOMIC GENERIC NORETURN STATIC_ASSERT THREAD_LOCAL
+%token		ALIGNAS ALIGNOF ATOMIC GENERIC NORETURN STATIC_ASSERT THREAD_LOCAL
 
 %start translation_unit
 
@@ -83,7 +90,14 @@ void yyerror(const char *);
 
 %type <ival> slice_expression slice_item
 
-
+%type <sval> primary_expression postfix_expression unary_expression cast_expression
+%type <sval> multiplicative_expression additive_expression shift_expression
+%type <sval> relational_expression equality_expression and_expression
+%type <sval> exclusive_or_expression inclusive_or_expression
+%type <sval> logical_and_expression logical_or_expression
+%type <sval> conditional_expression assignment_expression expression
+%type <sval> constant string for_cond_expr
+%type <val>  unary_operator assignment_operator argument_expression_list
 
 %union
 {
@@ -97,17 +111,17 @@ void yyerror(const char *);
 %%
 
 primary_expression
-	: IDENTIFIER
-	| constant
-	| string
-	| '(' expression ')'
-	| generic_selection
+	: IDENTIFIER			{ $$ = $1; icg_set_type($1, sym_lookup($1)); }
+	| constant				{ $$ = $1; }
+	| string				{ $$ = $1; }
+	| '(' expression ')'	{ $$ = $2; }
+	| generic_selection		{ $$ = strdup("generic"); }
 	;
 
 constant
-	: I_CONSTANT {int_consts++;}	/* includes character_constant */
-	| F_CONSTANT {float_consts++;}
-	| ENUMERATION_CONSTANT	/* after it has been defined as such */
+	: I_CONSTANT	{ int_consts++;   char *s=malloc(16); sprintf(s,"%d",$1); $$=s; icg_set_type(s,T_INT); }
+	| F_CONSTANT	{ float_consts++; char *s=strdup("fconst"); $$=s; icg_set_type(s,T_FLOAT); }
+	| ENUMERATION_CONSTANT	{ $$ = strdup("enum_const"); }
 	;
 
 enumeration_constant		/* before it has been defined as such */
@@ -115,8 +129,8 @@ enumeration_constant		/* before it has been defined as such */
 	;
 
 string
-	: STRING_LITERAL {string_literals++;}
-	| FUNC_NAME
+	: STRING_LITERAL	{ string_literals++; char *s=strdup("str_lit"); $$=s; icg_set_type(s,T_STRING); }
+	| FUNC_NAME			{ $$ = strdup("func_name"); }
 	;
 
 generic_selection
@@ -135,147 +149,211 @@ generic_association
 
 slice_item
 	: assignment_expression { $$ = 0; }
-	| ':' { $$ = 1; }
+	| ':'                   { $$ = 1; }
 	;
 
 slice_expression
-	: slice_item { $$ = $1; }
-	| slice_expression ',' slice_item { $$ = 1; }
+	: slice_item                        { $$ = $1; }
+	| slice_expression ',' slice_item   { $$ = 1; }
 	;
 
 postfix_expression
 	: primary_expression
-	| postfix_expression '[' slice_expression ']' { if ($3) slice_expressions_count++; }
+		{ $$ = $1; }
+	| postfix_expression '[' slice_expression ']'
+		{ if ($3) slice_expressions_count++; $$ = $1; }
 	| postfix_expression '(' ')'
+		{ char *t=newTemp(); emit("call",$1,"0",t); $$=t; }
 	| postfix_expression '(' argument_expression_list ')'
+		{ char cnt[8]; sprintf(cnt,"%d",$3); char *t=newTemp(); emit("call",$1,cnt,t); $$=t; }
 	| postfix_expression '.' IDENTIFIER
+		{ char b[128]; snprintf(b,127,"%s.%s",$1,$3); $$=strdup(b); }
 	| postfix_expression PTR_OP IDENTIFIER
+		{ char b[128]; snprintf(b,127,"%s->%s",$1,$3); $$=strdup(b); }
 	| postfix_expression INC_OP
+		{ emit("++",$1,"",$1); $$=$1; }
 	| postfix_expression DEC_OP
+		{ emit("--",$1,"",$1); $$=$1; }
 	| '(' type_name ')' '{' initializer_list '}'
+		{ $$ = strdup("init_list"); }
 	| '(' type_name ')' '{' initializer_list ',' '}'
+		{ $$ = strdup("init_list"); }
 	;
 
 argument_expression_list
 	: assignment_expression
+		{ emit("param",$1,"",""); $$ = 1; }
 	| argument_expression_list ',' assignment_expression
+		{ emit("param",$3,"",""); $$ = $1 + 1; }
 	;
 
 unary_expression
 	: postfix_expression
+		{ $$ = $1; }
 	| INC_OP unary_expression
+		{ emit("++",$2,"",$2); $$=$2; }
 	| DEC_OP unary_expression
+		{ emit("--",$2,"",$2); $$=$2; }
 	| unary_operator cast_expression
+		{ if ($1=='-') { char *t=newTemp(); emit("minus",$2,"",t); $$=t; } else $$=$2; }
 	| SIZEOF unary_expression
+		{ $$ = strdup("sizeof"); }
 	| SIZEOF '(' type_name ')'
+		{ $$ = strdup("sizeof"); }
 	| ALIGNOF '(' type_name ')'
+		{ $$ = strdup("alignof"); }
 	;
 
 unary_operator
-	: '&'
-	| '*'
-	| '+'
-	| '-'
-	| '~'
-	| '!'
+	: '&'	{ $$ = '&'; }
+	| '*'	{ $$ = '*'; }
+	| '+'	{ $$ = '+'; }
+	| '-'	{ $$ = '-'; }
+	| '~'	{ $$ = '~'; }
+	| '!'	{ $$ = '!'; }
 	;
 
 cast_expression
-	: unary_expression
-	| '(' type_name ')' cast_expression
+	: unary_expression					{ $$ = $1; }
+	| '(' type_name ')' cast_expression	{ $$ = $4; }
 	;
 
 multiplicative_expression
 	: cast_expression
+		{ $$ = $1; }
 	| multiplicative_expression '*' cast_expression
+		{ char *t=newTemp(); emit("*",$1,$3,t); $$=t; }
 	| multiplicative_expression '/' cast_expression
+		{ char *t=newTemp(); emit("/",$1,$3,t); $$=t; }
 	| multiplicative_expression '%' cast_expression
-	| multiplicative_expression DOT_MUL cast_expression {tensor_elementwise_ops++;}
-	| multiplicative_expression DOT_DIV cast_expression {tensor_elementwise_ops++;}
-	| multiplicative_expression AT cast_expression {tensor_contractions++;}
-	| multiplicative_expression AT_MUL cast_expression {tensor_products++;}
+		{ char *t=newTemp(); emit("%",$1,$3,t); $$=t; }
+	| multiplicative_expression DOT_MUL cast_expression
+		{ tensor_elementwise_ops++; char *t=newTemp(); emit(".*",$1,$3,t); $$=t; }
+	| multiplicative_expression DOT_DIV cast_expression
+		{ tensor_elementwise_ops++; char *t=newTemp(); emit("./",$1,$3,t); $$=t; }
+	| multiplicative_expression AT cast_expression
+		{ tensor_contractions++; char *t=newTemp(); emit("@",$1,$3,t); $$=t; }
+	| multiplicative_expression AT_MUL cast_expression
+		{ tensor_products++; char *t=newTemp(); emit("@*",$1,$3,t); $$=t; }
 	;
 
 additive_expression
 	: multiplicative_expression
+		{ $$ = $1; }
 	| additive_expression '+' multiplicative_expression
+		{ char *t=newTemp(); emit("+",$1,$3,t); $$=t; }
 	| additive_expression '-' multiplicative_expression
-	| additive_expression DOT_ADD multiplicative_expression {tensor_elementwise_ops++;}
-	| additive_expression DOT_SUB multiplicative_expression {tensor_elementwise_ops++;}
+		{ char *t=newTemp(); emit("-",$1,$3,t); $$=t; }
+	| additive_expression DOT_ADD multiplicative_expression
+		{ tensor_elementwise_ops++; char *t=newTemp(); emit(".+",$1,$3,t); $$=t; }
+	| additive_expression DOT_SUB multiplicative_expression
+		{ tensor_elementwise_ops++; char *t=newTemp(); emit(".-",$1,$3,t); $$=t; }
 	;
 
 shift_expression
 	: additive_expression
+		{ $$ = $1; }
 	| shift_expression LEFT_OP additive_expression
+		{ char *t=newTemp(); emit("<<",$1,$3,t); $$=t; }
 	| shift_expression RIGHT_OP additive_expression
+		{ char *t=newTemp(); emit(">>",$1,$3,t); $$=t; }
 	;
 
 relational_expression
 	: shift_expression
+		{ $$ = $1; }
 	| relational_expression '<' shift_expression
+		{ char *t=newTemp(); emit("<",$1,$3,t); $$=t; }
 	| relational_expression '>' shift_expression
+		{ char *t=newTemp(); emit(">",$1,$3,t); $$=t; }
 	| relational_expression LE_OP shift_expression
+		{ char *t=newTemp(); emit("<=",$1,$3,t); $$=t; }
 	| relational_expression GE_OP shift_expression
+		{ char *t=newTemp(); emit(">=",$1,$3,t); $$=t; }
 	| relational_expression TH_OP shift_expression
+		{ char *t=newTemp(); emit("<=>",$1,$3,t); $$=t; }
 	;
 
 equality_expression
 	: relational_expression
+		{ $$ = $1; }
 	| equality_expression EQ_OP relational_expression
+		{ char *t=newTemp(); emit("==",$1,$3,t); $$=t; }
 	| equality_expression NE_OP relational_expression
+		{ char *t=newTemp(); emit("!=",$1,$3,t); $$=t; }
 	;
 
 and_expression
 	: equality_expression
+		{ $$ = $1; }
 	| and_expression '&' equality_expression
+		{ char *t=newTemp(); emit("&",$1,$3,t); $$=t; }
 	;
 
 exclusive_or_expression
 	: and_expression
+		{ $$ = $1; }
 	| exclusive_or_expression '^' and_expression
+		{ char *t=newTemp(); emit("^",$1,$3,t); $$=t; }
 	;
 
 inclusive_or_expression
 	: exclusive_or_expression
+		{ $$ = $1; }
 	| inclusive_or_expression '|' exclusive_or_expression
+		{ char *t=newTemp(); emit("|",$1,$3,t); $$=t; }
 	;
 
 logical_and_expression
 	: inclusive_or_expression
+		{ $$ = $1; }
 	| logical_and_expression AND_OP inclusive_or_expression
+		{ char *t=newTemp(); emit("&&",$1,$3,t); $$=t; }
 	;
 
 logical_or_expression
 	: logical_and_expression
+		{ $$ = $1; }
 	| logical_or_expression OR_OP logical_and_expression
+		{ char *t=newTemp(); emit("||",$1,$3,t); $$=t; }
 	;
 
 conditional_expression
-	: logical_or_expression
+	: logical_or_expression	{ $$ = icg_cond = $1; }
 	;
 
 assignment_expression
 	: conditional_expression
+		{ $$ = $1; }
 	| unary_expression assignment_operator assignment_expression
+		{
+			if ($2=='=') {
+				emit("=",$3,"",$1);
+			} else {
+				char cop[3]={(char)$2,'\0','\0'};
+				char *t=newTemp(); emit(cop,$1,$3,t); emit("=",t,"",$1);
+			}
+			$$=$1;
+		}
 	;
 
 assignment_operator
-	: '='
-	| MUL_ASSIGN
-	| DIV_ASSIGN
-	| MOD_ASSIGN
-	| ADD_ASSIGN
-	| SUB_ASSIGN
-	| LEFT_ASSIGN
-	| RIGHT_ASSIGN
-	| AND_ASSIGN
-	| XOR_ASSIGN
-	| OR_ASSIGN
+	: '='          { $$='='; }
+	| MUL_ASSIGN   { $$='*'; }
+	| DIV_ASSIGN   { $$='/'; }
+	| MOD_ASSIGN   { $$='%'; }
+	| ADD_ASSIGN   { $$='+'; }
+	| SUB_ASSIGN   { $$='-'; }
+	| LEFT_ASSIGN  { $$='<'; }
+	| RIGHT_ASSIGN { $$='>'; }
+	| AND_ASSIGN   { $$='&'; }
+	| XOR_ASSIGN   { $$='^'; }
+	| OR_ASSIGN    { $$='|'; }
 	;
 
 expression
-	: assignment_expression
-	| expression ',' assignment_expression
+	: assignment_expression                     { $$ = $1; }
+	| expression ',' assignment_expression      { $$ = $3; }
 	;
 
 constant_expression
@@ -321,18 +399,18 @@ storage_class_specifier
 	;
 
 type_specifier
-	: VOID
-	| CHAR
-	| SHORT
-	| INT
-	| LONG
-	| FP
-	| DOUBLE
-	| SIGNED
-	| UNSIGNED
+	: VOID		{ current_decl_type = T_UNKNOWN; }
+	| CHAR		{ current_decl_type = T_INT; }
+	| SHORT		{ current_decl_type = T_INT; }
+	| INT		{ current_decl_type = T_INT; }
+	| LONG		{ current_decl_type = T_INT; }
+	| FP		{ current_decl_type = T_FLOAT; }
+	| DOUBLE	{ current_decl_type = T_FLOAT; }
+	| SIGNED	{ current_decl_type = T_INT; }
+	| UNSIGNED	{ current_decl_type = T_INT; }
 	| TEXT
 	| tensor_type
-	| BOOL
+	| BOOL		{ current_decl_type = T_INT; }
 	| COMPLEX
 	| IMAGINARY	  	/* non-mandated extension */
 	| struct_or_union_specifier
@@ -434,7 +512,7 @@ declarator
 	;
 
 direct_declarator
-	: IDENTIFIER
+	: IDENTIFIER	{ sym_declare($1, current_decl_type); icg_set_type($1, current_decl_type); }
 	| '(' declarator ')'
 	| direct_declarator '[' ']'
 	| direct_declarator '[' '*' ']'
@@ -567,7 +645,7 @@ labeled_statement
 
 compound_statement
 	: '{' '}'
-	| '{'  block_item_list '}'
+	| '{' { sym_enter_scope(); } block_item_list '}' { sym_exit_scope(); }
 	;
 
 block_item_list
@@ -585,38 +663,85 @@ expression_statement
 	| expression ';'
 	;
 
+/*
+ * if_cond: named mid-rule for the common "IF '(' expression ')'" prefix.
+ *   Emits ifFalse for the condition and returns L_false.
+ *   Resolves the reduce/reduce conflict from three identical inline MRs.
+ *   Accesses the expression as the token 3 steps back on the parse stack.
+ */
+if_cond
+    : /* fires after IF '(' expression ')'; icg_cond holds the expr place */
+      { $<sval>$ = labelStr(newLabel()); emit("ifFalse",icg_cond,"",$<sval>$); }
+    ;
+
 selection_statement
-    : IF '(' expression ')' compound_statement ELSE selection_statement
-      {
-          ladder_len++;
-          if (ladder_len >= max) {
-              max = ladder_len;
-          }
-          ladder_len--;
-      }
-    | IF '(' expression ')' compound_statement ELSE compound_statement
-      {
-          ladder_len++;
-          if (ladder_len >= max) {
-              max = ladder_len;
-          }
-          ladder_len--;
-	  }
-    | IF '(' expression ')' compound_statement
-      {
-          ifs_wo_else++;
-      }
+    : IF '(' expression ')' if_cond
+      compound_statement ELSE
+      { char *Le=labelStr(newLabel()); emit("goto",Le,"","");
+        emit("label",$<sval>5,"",""); $<sval>$=Le; }
+      compound_statement
+      { emit("label",$<sval>8,"","");
+        ladder_len++; if(ladder_len>=max)max=ladder_len; ladder_len--; }
+    | IF '(' expression ')' if_cond
+      compound_statement ELSE
+      { char *Le=labelStr(newLabel()); emit("goto",Le,"","");
+        emit("label",$<sval>5,"",""); $<sval>$=Le; }
+      selection_statement
+      { emit("label",$<sval>8,"","");
+        ladder_len++; if(ladder_len>=max)max=ladder_len; ladder_len--; }
+    | IF '(' expression ')' if_cond
+      compound_statement
+      { emit("label",$<sval>5,"",""); ifs_wo_else++; }
     | SWITCH '(' expression ')' compound_statement
     ;
 
+/*
+ * for_init  : init part of for (expression ';', ';', or declaration)
+ * for_cond_expr : condition part, returns place or NULL
+ */
+for_init
+	: ';'
+	| expression ';'
+	| declaration
+	;
+
+for_cond_expr
+	: ';'            { $$ = NULL; }
+	| expression ';' { $$ = $1; }
+	;
+
+/*
+ * loop_statement: mid-rule actions for WHILE, DO, FOR generate
+ *   labels and back-edges.
+ *   WHILE: $2=MR(L_start after emit label), $6=MR(L_end after emit ifFalse)
+ *   FOR:   $4=MR(L_start), $6=MR(L_end after emit ifFalse)
+ *   DO:    $2=MR(L_start)
+ */
 loop_statement
-	: WHILE '(' expression ')' compound_statement
-	| DO compound_statement WHILE '(' expression ')' ';'
-	| FOR '(' expression_statement expression_statement ')' compound_statement
-	| FOR '(' expression_statement expression_statement expression ')' compound_statement
-	| FOR '(' declaration expression_statement ')' compound_statement
-	| FOR '(' declaration expression_statement expression ')' compound_statement
-	| FOR IDENTIFIER IN IDENTIFIER axis_clause compound_statement {tensor_loops++;}
+	: WHILE { loop_depth++; }
+	  { char *Ls=labelStr(newLabel()); emit("label",Ls,"",""); $<sval>$=Ls; }
+	  '(' expression ')'
+	  { char *Le=labelStr(newLabel()); emit("ifFalse",$5,"",Le); $<sval>$=Le; }
+	  compound_statement
+	  { loop_depth--; emit("goto",$<sval>3,"",""); emit("label",$<sval>7,"",""); }
+	| DO { loop_depth++; }
+	  { char *Ls=labelStr(newLabel()); emit("label",Ls,"",""); $<sval>$=Ls; }
+	  compound_statement WHILE '(' expression ')' ';'
+	  { loop_depth--; emit("ifTrue",$7,"",$<sval>3); }
+	| FOR { loop_depth++; } '(' for_init
+	  { char *Ls=labelStr(newLabel()); emit("label",Ls,"",""); $<sval>$=Ls; }
+	  for_cond_expr
+	  { char *Le=labelStr(newLabel()); if($6) emit("ifFalse",$6,"",Le); $<sval>$=Le; }
+	  for_step ')' compound_statement
+	  { loop_depth--; emit("goto",$<sval>5,"",""); emit("label",$<sval>7,"",""); }
+	| FOR IDENTIFIER IN IDENTIFIER axis_clause compound_statement
+	  { tensor_loops++; emit("tensor_for",$2,$4,""); }
+	;
+
+/* for_step: optional step expression in for-loop (before closing ')') */
+for_step
+	: /* empty */
+	| expression
 	;
 
 iteration_statement
@@ -641,13 +766,13 @@ dimension_list
     ;
 
 jump_statement
-	: GOTO IDENTIFIER ';'
-	| CONTINUE ';'
-	| CONTINUE IDENTIFIER ';' {labeled_continues++;}
-	| BREAK ';'
-	| BREAK IDENTIFIER ';' {labeled_breaks++;}
-	| RETURN ';'
-	| RETURN expression ';'
+	: GOTO IDENTIFIER ';'           { emit("goto",$2,"",""); }
+	| CONTINUE ';'          { if(!loop_depth) fprintf(stderr,"ICG Error: 'continue' outside loop\n"); }
+	| CONTINUE IDENTIFIER ';' { labeled_continues++; if(!loop_depth) fprintf(stderr,"ICG Error: 'continue' outside loop\n"); }
+	| BREAK ';'             { if(!loop_depth) fprintf(stderr,"ICG Error: 'break' outside loop/switch\n"); }
+	| BREAK IDENTIFIER ';'  { labeled_breaks++; if(!loop_depth) fprintf(stderr,"ICG Error: 'break' outside loop/switch\n"); }
+	| RETURN ';'                    { emit("return","","",""); }
+	| RETURN expression ';'         { emit("return",$2,"",""); }
 	;
 
 translation_unit
@@ -783,6 +908,9 @@ int main(int argc, char **argv)
 	printf("Lexer throughput: %.2f tokens/second\n", throughput);
 	printf("Parser speed: %.6f seconds\n", parse_time);
 	printf("Memory usage during parsing: %ld bytes\n", rusage_after.ru_maxrss * 1024);
+
+	/* Print generated intermediate code */
+	printQuads();
 
 	return(0);
 }
